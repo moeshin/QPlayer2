@@ -1,0 +1,225 @@
+#QPlayer {
+    z-index: 10;
+    position: fixed;
+    left: -264px;
+    bottom: 48px;
+    transition: transform .8s;
+    pointer-events: none;
+    font-size: 12px;
+    color: #666666;
+}
+#QPlayer svg, #QPlayer img {
+    cursor: pointer;
+}
+#QPlayer-cover, #QPlayer-progress, #QPlayer-control-play, #QPlayer-control-more {
+    user-select: none;
+}
+#QPlayer-panel, #QPlayer-switch, #QPlayer-list, #QPlayer-lyric {
+    background: #FFFFFF;
+    pointer-events: auto;
+}
+#QPlayer-panel {
+    float: left;
+    width: 264px;
+}
+#QPlayer-cover {
+    width: 64px;
+    height: 64px;
+    float: left;
+    border-radius: 50%;
+}
+#QPlayer-cover.QPlayer-cover-rotate {
+    animation: rotate 10s linear 0s infinite normal none paused;
+}
+#QPlayer.QPlayer-playing #QPlayer-cover.QPlayer-cover-rotate {
+    animation-play-state: running;
+}
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+#QPlayer-control {
+    margin-left: 64px;
+    padding: 6px 8px;
+}
+#QPlayer-title {
+    overflow: hidden;
+    white-space: nowrap;
+}
+#QPlayer-progress {
+    height: 2px;
+    margin: 8px 0;
+    background: #cdcdcd;
+    cursor: pointer;
+}
+#QPlayer-progress-current {
+    position: relative;
+    max-width: 100%;
+    height: 2px;
+    background: #EE1122;
+}
+#QPlayer-progress-current::after {
+    content: ' ';
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 8px;
+    height: 8px;
+    background-color: #FFFFFF;
+    border-radius: 50%;
+    border: 1px solid #AAAAAA;
+}
+#QPlayer-switch {
+    position: relative;
+    float: left;
+    width: 24px;
+    height: 64px;
+    background: #EE1122;
+    cursor: pointer;
+}
+#QPlayer-switch svg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto 0;
+    fill: #FFFFFF;
+    transition: transform .2s ease-out;
+    filter: drop-shadow(0 0 4px black);
+}
+#QPlayer-time {
+    position: absolute;
+    line-height: 18px;
+}
+#QPlayer-control-bar {
+    position: relative;
+}
+#QPlayer-control-bar svg {
+    fill: #666666;
+    transition: fill .2s linear;
+}
+#QPlayer-control-bar svg:hover {
+    fill: #3d3d3d;
+}
+#QPlayer-control-play {
+    position: relative;
+    width: 64px;
+    height: 18px;
+    margin: 0 auto;
+}
+#QPlayer-btn-play {
+    display: block;
+    width: 18px;
+    margin: 0 auto;
+}
+#QPlayer-btn-play svg {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    transition: opacity .2s cubic-bezier(1, 0, 1, 1), transform .2s linear, visibility .2s linear, fill .2s linear;
+}
+#QPlayer-play, .QPlayer-playing #QPlayer-pause {
+    visibility: visible;
+    opacity: 1;
+}
+#QPlayer-pause, .QPlayer-playing #QPlayer-play {
+    visibility: hidden;
+    opacity: 0;
+}
+.QPlayer-playing #QPlayer-btn-play svg  {
+    transform: rotate(-180deg);
+}
+#QPlayer-btn-previous, #QPlayer-btn-next {
+    position: absolute;
+    width: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+#QPlayer-btn-next {
+    right: 0;
+}
+#QPlayer-control-more {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+#QPlayer-control-more svg {
+    width: 18px;
+    height: 18px;
+}
+.QPlayer-show#QPlayer {
+    transform: translateX(264px);
+}
+.QPlayer-show #QPlayer-switch svg {
+    transform: rotate(180deg);
+}
+#QPlayer-more {
+    transition: transform .8s;
+}
+#QPlayer-more, .QPlayer-show #QPlayer-more.QPlayer-lyric-show {
+    transform: translateX(-264px);
+}
+#QPlayer-more.QPlayer-list-show,
+#QPlayer-more.QPlayer-lyric-show,
+#QPlayer-more.QPlayer-list-show.QPlayer-lyric-show {
+    transform: translateX(0);
+}
+#QPlayer-list {
+    float: left;
+    max-height: 1px;
+    width: 264px;
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+    transition: max-height .8s;
+}
+#QPlayer-more.QPlayer-list-show #QPlayer-list {
+    max-height: 360px;
+}
+#QPlayer-list li {
+    padding: 2px 10px;
+    line-height: 2;
+    border: 1px solid rgb(222, 222, 222);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    list-style-position: inside;
+    transition: padding .2s;
+    cursor: pointer;
+}
+#QPlayer-list li:hover, #QPlayer-list li.QPlayer-list-current {
+    padding: 2px 10px 2px 6px;
+    color: #3D3D3D;
+    font-weight: bold;
+    border-left: 4px solid #EE1122;
+}
+#QPlayer-list span {
+    float: right;
+}
+#QPlayer-lyric {
+    float: left;
+    width: 150px;
+    height: 0;
+    border-radius: 0 8px 8px 0;
+    overflow: auto;
+    transition: height .8s;
+}
+#QPlayer-more.QPlayer-lyric-show #QPlayer-lyric {
+    height: 160px;
+    border: 1px solid rgb(222, 222, 222);
+}
+#QPlayer-lyric p {
+    text-align: center;
+}
+#QPlayer-lyric.QPlayer-lyric-no {
+    /*position: relative;*/
+}
+#QPlayer-lyric.QPlayer-lyric-no p {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+    color: #EE1122;
+}

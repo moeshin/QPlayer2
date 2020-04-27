@@ -20,8 +20,7 @@ $(function () {
     ;
 
     const
-        audio = $audio[0],
-        list = $list[0]
+        audio = $audio[0]
     ;
 
     // Test
@@ -30,40 +29,81 @@ $(function () {
     q.index = -1;
     q.current = null;
 
-    function History() {
-        this.index = -1;
-        this.list = [];
+    function Random(index) {
+        const _this = this;
+        if (index === undefined) {
+            this.index = -1;
+            this.list = [];
+        } else {
+            this.index = 0;
+            this.list = [index];
+        }
         this.next = function () {
-            if (++this.index === this.list.length) {
-                return this.push();
+            if (this.index + 1 === this.list.length) {
+                if (this.list.length === v.list.length) {
+                    this.index = 0;
+                    return _this.list[0];
+                }
+                return push();
             }
-            return this.list[this.index];
+            return this.list[++this.index];
         };
         this.previous = function () {
             if (this.index === 0) {
-                const index = getRandomIndex();
+                const length = v.list.length;
+                if (this.list.length === length) {
+                    this.index = length - 1;
+                    return this.list[this.index];
+                }
+                const index = getIndex();
                 this.list.splice(0, 0, index);
                 return index;
             }
             if (this.index === -1) {
-                return this.push();
+                return push();
             }
             return this.list[--this.index];
         };
-        this.push = function () {
-            const index = getRandomIndex();
-            this.list.push(index);
+        this.remove = function (index) {
+            const list = this.list;
+            const _index = list.indexOf(index);
+            if (_index === -1) {
+                return false;
+            }
+            list.splice(_index, 1);
+            --this.index;
+        };
+        function push() {
+            const index = getIndex();
+            _this.list.push(index);
+            ++_this.index;
             return index;
+        }
+        function getIndex() {
+            const length = v.list.length;
+            if (_this.index === -1) {
+                return random(length);
+            }
+            const list = [];
+            for (let i = 0; i < length; ++i) {
+                if (_this.list.includes(i)) {
+                    continue;
+                }
+                list.push(i);
+            }
+            return list[random(list.length)];
+        }
+        function random(max) {
+            return Math.floor(Math.random() * max);
         }
     }
 
-    function getRandomIndex() {
-        return Math.floor(Math.random() * q.list.length);
-    }
-
     function getNextIndex() {
+        if (v.list.length === 0) {
+            return false;
+        }
         if (q.isRandom) {
-            return q.history.next();
+            return q.random.next();
         }
         if (++q.index === q.list.length) {
             q.index = 0;
@@ -72,8 +112,11 @@ $(function () {
     }
 
     function getPreviousIndex() {
+        if (v.list.length === 0) {
+            return false;
+        }
         if (q.isRandom) {
-            return q.history.previous();
+            return q.random.previous();
         }
         if (--q.index < 0) {
             q.index = q.list.length - 1;
@@ -116,8 +159,8 @@ $(function () {
         return $q.hasClass('QPlayer-playing');
     }
 
-    function getLi(index) {
-        return $(list.children[index]);
+    function get$Li(index) {
+        return $list.children(`:not(.QPlayer-list-error):eq(${index})`);
     }
 
     /**
@@ -133,7 +176,7 @@ $(function () {
             return false;
         }
         if (typeof index === 'number') {
-            if (!(length > index)) {
+            if (!(length > index || index > 0)) {
                 console.warn(`超出 list，length=${length}，index=${index}`);
                 return false;
             }
@@ -145,7 +188,7 @@ $(function () {
         $artist.text(current.artist);
         $cover.attr('src', current.cover);
         $list.children('.QPlayer-list-current').removeClass('QPlayer-list-current');
-        getLi(index).addClass('QPlayer-list-current');
+        get$Li(index).addClass('QPlayer-list-current');
         // todo 加载歌词
 
         q.index = index;
@@ -158,34 +201,69 @@ $(function () {
      * 播放
      *
      * @param index
+     * @param isPrevious
      * @return {number}
      * 0 错误
-     * 1 成功
-     * 2 请求 API
+     * 1 List 为空
+     * 2 成功
+     * 3 请求 API
      */
-    q.play = function(index) {
-        if (typeof index === 'number') {
+    function play(index, isPrevious) {
+        // FIXME 递归栈溢出
+        function error(index) {
+            get$Li(index).addClass('QPlayer-list-error');
+            v.list.splice(index, 1);
+            q.random.remove(index);
+        }
+        function errorSync() {
+            error(index);
+        }
+        function errorAsync() {
+            const list = v.list;
+            const _index = list[index] === current ? index : list.indexOf(current);
+            if (_index === -1) {
+                console.warn('未找到索引');
+                return;
+            }
+            error(_index);
+            if (isPrevious) {
+                q.previous();
+            } else {
+                q.next();
+            }
+        }
+
+        if (index === false) {
+            console.warn('list 为空！');
+            return 1;
+        } else if (typeof index === 'number') {
             if (!q.load(index)) {
+                errorSync();
                 return 0;
             }
-        } else if(audio.readyState !== 0) {
-            onPlay();
-            audio.play();
-            return 1;
+        } else {
+            index = q.index;
+            if (audio.readyState !== 0) {
+                onPlay();
+                audio.play();
+                return 2;
+            }
         }
 
         const current = q.current;
         if (current.url) {
             playAudio();
-            return 1;
+            return 2;
         }
         const id = current.id;
         if (!id) {
+            errorSync();
             return 0;
         }
         const source = current.source || 'netease';
         if (source !== 'netease') {
             console.warn('暂不支持源：' + source);
+            errorSync();
             return 0;
         }
         onPlayPrepare();
@@ -197,21 +275,27 @@ $(function () {
                 id: id
             },
             success: function (json) {
-                console.log('success');
                 const url = json.url;
                 if (url) {
                     current.url = url;
                     playAudio();
                 } else {
-                    // error
+                    errorAsync();
                 }
             },
             error: function () {
-                console.log('error');
-                console.log(arguments);
+                errorAsync();
             }
         });
-        return 2;
+        return 3;
+    }
+
+    q.play = function(index, isPrevious) {
+        const bool = play(index, isPrevious);
+        if (bool) {
+            return bool;
+        }
+        return isPrevious ? q.previous() : q.next();
     };
 
     q.pause = function() {
@@ -220,11 +304,11 @@ $(function () {
     };
 
     q.next = function() {
-        q.play(getNextIndex());
+        return q.play(getNextIndex());
     };
 
     q.previous = function previous() {
-        q.play(getPreviousIndex());
+        return q.play(getPreviousIndex(), true);
     };
 
     $('#QPlayer-switch').click(function () {
@@ -245,12 +329,12 @@ $(function () {
     });
     $('#QPlayer-btn-next').click(q.next);
     $('#QPlayer-btn-previous').click(q.previous);
-    $list.on('click', 'li', function () {
-        const item = this.QPlayer;
-        if (item) {
-
+    $list.on('click', 'li:not(.QPlayer-list-current, .QPlayer-list-error)', function () {
+        const index = $list.children(':not(.QPlayer-list-error)').index(this);
+        if (q.isRandom) {
+            q.random = new Random(index);
         }
-        q.play(item.index());
+        q.play(index);
     });
     $audio
         .on('playing', onPlay)
@@ -267,12 +351,12 @@ $(function () {
     function defineProperties(obj, properties) {
         const keys = Object.keys(properties);
         const length = keys.length;
-        for (let i = 0; i < length; i++) {
+        for (let i = 0; i < length; ++i) {
             const key = keys[i];
             v[key] = obj[key];
         }
         Object.defineProperties(obj, properties);
-        for (let i = 0; i < length; i++) {
+        for (let i = 0; i < length; ++i) {
             const key = keys[i];
             obj[key] = v[key] || properties[key].default;
         }
@@ -285,7 +369,9 @@ $(function () {
             },
             set: function (bool) {
                 v.isRandom = bool;
-                q.history = new History();
+                if (bool) {
+                    q.random = new Random();
+                }
             },
             default: false
         },

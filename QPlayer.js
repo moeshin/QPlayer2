@@ -19,7 +19,10 @@ $(function () {
         $progress = $('#QPlayer-progress-current')
     ;
 
-    const audio = $audio[0];
+    const
+        audio = $audio[0],
+        list = $list[0]
+    ;
 
     // Test
     window._audio = audio;
@@ -30,7 +33,7 @@ $(function () {
     initHistory();
 
     function initHistory() {
-        q.history = {index: -1, list: []};;
+        q.history = {index: -1, list: []};
     }
 
     function getNextIndex() {
@@ -75,57 +78,8 @@ $(function () {
         return $q.hasClass('QPlayer-playing');
     }
 
-    function load(item) {
-        if (q.current === item) {
-            return;
-        }
-        $name.text(item.name);
-        $artist.text(item.artist);
-        $cover.attr('src', item.cover);
-        $(q.current.target).removeClass('QPlayer-list-current');
-        $(item.target).addClass('QPlayer-list-current');
-        q.current = item;
-    }
-
-    function play(item) {
-        load(item);
-        if (item.url) {
-            playAudio();
-            return true;
-        }
-        const id = item.id;
-        if (!id) {
-            return false;
-        }
-        const source = item.source || 'netease';
-        if (source !== 'netease') {
-            console.warn('暂不支持源：' + source);
-            return 0;
-        }
-        onPlayPrepare();
-        $.ajax({
-            dataType: 'jsonp',
-            url: 'https://api.littlehands.site/NeteaseMusic/',
-            data: {
-                type: 'song',
-                id: id
-            },
-            success: function (json) {
-                console.log('success');
-                const url = json.url;
-                if (url) {
-                    item.url = url;
-                    playAudio();
-                } else {
-                    // error
-                }
-            },
-            error: function () {
-                console.log('error');
-                console.log(arguments);
-            }
-        });
-        return 2;
+    function getLi(index) {
+        return $(list.children[index]);
     }
 
     /**
@@ -153,7 +107,7 @@ $(function () {
         $artist.text(current.artist);
         $cover.attr('src', current.cover);
         $list.children('.QPlayer-list-current').removeClass('QPlayer-list-current');
-        $list.children(`:eq(${index})`).addClass('QPlayer-list-current');
+        getLi(index).addClass('QPlayer-list-current');
         // todo 加载歌词
 
         q.index = index;

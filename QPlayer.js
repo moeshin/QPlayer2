@@ -29,18 +29,56 @@ $(function () {
 
     q.index = -1;
     q.current = null;
-    q.history = {index: -1, list: []};
-    initHistory();
 
-    function initHistory() {
-        q.history = {index: -1, list: []};
+    function History() {
+        this.index = -1;
+        this.list = [];
+        this.next = function () {
+            if (++this.index === this.list.length) {
+                return this.push();
+            }
+            return this.list[this.index];
+        };
+        this.previous = function () {
+            if (this.index === 0) {
+                const index = getRandomIndex();
+                this.list.splice(0, 0, index);
+                return index;
+            }
+            if (this.index === -1) {
+                return this.push();
+            }
+            return this.list[--this.index];
+        };
+        this.push = function () {
+            const index = getRandomIndex();
+            this.list.push(index);
+            return index;
+        }
+    }
+
+    function getRandomIndex() {
+        return Math.floor(Math.random() * q.list.length);
     }
 
     function getNextIndex() {
         if (q.isRandom) {
-            return Math.round(Math.random() * q.list.length - 1);
+            return q.history.next();
         }
-        return ++q.index === q.list.length ? q.index = 0 : q.index;
+        if (++q.index === q.list.length) {
+            q.index = 0;
+        }
+        return q.index;
+    }
+
+    function getPreviousIndex() {
+        if (q.isRandom) {
+            return q.history.previous();
+        }
+        if (--q.index < 0) {
+            q.index = q.list.length - 1;
+        }
+        return q.index;
     }
 
     function playAudio() {
@@ -125,7 +163,7 @@ $(function () {
      * 1 成功
      * 2 请求 API
      */
-    q.play = function(index, history) {
+    q.play = function(index) {
         if (typeof index === 'number') {
             if (!q.load(index)) {
                 return 0;
@@ -185,8 +223,8 @@ $(function () {
         q.play(getNextIndex());
     };
 
-    q.previous = function() {
-
+    q.previous = function previous() {
+        q.play(getPreviousIndex());
     };
 
     $('#QPlayer-switch').click(function () {
@@ -247,8 +285,7 @@ $(function () {
             },
             set: function (bool) {
                 v.isRandom = bool;
-                // q.history = [q.listIndex];
-                // q.histIndex = 0;
+                q.history = new History();
             },
             default: false
         },
@@ -311,6 +348,5 @@ $(function () {
             default: []
         }
     });
-
 });
 

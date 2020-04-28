@@ -8,6 +8,21 @@
     font-size: 12px;
     color: #666666;
 }
+#QPlayer ::-webkit-scrollbar {
+    width: 4px;
+}
+#QPlayer ::-webkit-scrollbar-track {
+    background: #00000033;
+}
+#QPlayer ::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background: #00000066;
+}
+/*noinspection CssUnknownProperty*/
+#QPlayer-list, #QPlayer-lyric {
+    scrollbar-width: thin;
+    scrollbar-color: #00000066 #00000033;
+}
 #QPlayer svg, #QPlayer img {
     cursor: pointer;
 }

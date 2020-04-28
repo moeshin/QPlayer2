@@ -19,7 +19,7 @@
     background: #00000066;
 }
 /*noinspection CssUnknownProperty*/
-#QPlayer-list, #QPlayer-lyric {
+#QPlayer-list, #QPlayer-lyrics {
     scrollbar-width: thin;
     scrollbar-color: #00000066 #00000033;
 }
@@ -29,7 +29,7 @@
 #QPlayer-cover, #QPlayer-progress, #QPlayer-control-play, #QPlayer-control-more {
     user-select: none;
 }
-#QPlayer-panel, #QPlayer-switch, #QPlayer-list, #QPlayer-lyric {
+#QPlayer-panel, #QPlayer-switch, #QPlayer-list, #QPlayer-lyrics {
     background: #FFFFFF;
     pointer-events: auto;
 }
@@ -174,12 +174,12 @@
 #QPlayer-more {
     transition: transform .8s;
 }
-#QPlayer-more, .QPlayer-show #QPlayer-more.QPlayer-lyric-show {
+#QPlayer-more, .QPlayer-show #QPlayer-more.QPlayer-lyrics-show {
     transform: translateX(-264px);
 }
 #QPlayer-more.QPlayer-list-show,
-#QPlayer-more.QPlayer-lyric-show,
-#QPlayer-more.QPlayer-list-show.QPlayer-lyric-show {
+#QPlayer-more.QPlayer-lyrics-show,
+#QPlayer-more.QPlayer-list-show.QPlayer-lyrics-show {
     transform: translateX(0);
 }
 #QPlayer-list {
@@ -216,7 +216,7 @@
 #QPlayer-list span {
     float: right;
 }
-#QPlayer-lyric {
+#QPlayer-lyrics {
     float: left;
     width: 150px;
     height: 0;
@@ -224,17 +224,17 @@
     overflow: auto;
     transition: height .8s;
 }
-#QPlayer-more.QPlayer-lyric-show #QPlayer-lyric {
+#QPlayer-more.QPlayer-lyrics-show #QPlayer-lyrics {
     height: 160px;
     border: 1px solid #DEDEDE;
 }
-#QPlayer-lyric p {
+#QPlayer-lyrics p {
     text-align: center;
 }
-#QPlayer-lyric.QPlayer-lyric-no {
+#QPlayer-lyrics.QPlayer-lyrics-no {
     /*position: relative;*/
 }
-#QPlayer-lyric.QPlayer-lyric-no p {
+#QPlayer-lyrics.QPlayer-lyrics-no p {
     position: relative;
     top: 50%;
     transform: translateY(-50%);

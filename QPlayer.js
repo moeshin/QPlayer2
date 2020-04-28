@@ -16,7 +16,8 @@ $(function () {
         $artist = $('#QPlayer-artist'),
         $more = $('#QPlayer-more'),
         $time = $('#QPlayer-time'),
-        $progress = $('#QPlayer-progress-current')
+        $progress = $('#QPlayer-progress'),
+        $progressCurrent = $('#QPlayer-progress-current')
     ;
 
     const
@@ -135,7 +136,7 @@ $(function () {
     }
 
     function onPlayPrepare() {
-        $progress.width('0');
+        $progressCurrent.width('0');
         onPlay();
     }
 
@@ -317,8 +318,8 @@ $(function () {
     $('#QPlayer-btn-list').click(function () {
         $more.toggleClass('QPlayer-list-show');
     });
-    $('#QPlayer-btn-lyric').click(function () {
-        $more.toggleClass('QPlayer-lyric-show');
+    $('#QPlayer-btn-lyrics').click(function () {
+        $more.toggleClass('QPlayer-lyrics-show');
     });
     $('#QPlayer-btn-play').click(function () {
         if (isPlaying()) {
@@ -343,10 +344,65 @@ $(function () {
         .on('timeupdate', function () {
             const time = audio.currentTime;
             $time.text(s2m(time));
-
-            $progress.width(100 * time / audio.duration + '%');
+            if (!isProgressClicked) {
+                $progressCurrent.width(100 * time / audio.duration + '%');
+            }
         })
     ;
+
+    // 进度条操作
+    let isProgressClicked;
+    function getXFromEvent(e) {
+        const type = e.type;
+        switch (type) {
+            case 'mousedown':
+            case 'mouseup':
+            case 'mousemove':
+                return e.pageX;
+            case 'touchstart':
+            case 'touchmove':
+            case 'touchend':
+                return e.originalEvent.changedTouches[0].pageX;
+        }
+        return false;
+    }
+    function getProgressFromEvent(e) {
+        return getXFromEvent(e) - $progress.offset().left;
+    }
+    function moveProgress(e) {
+        if (!isProgressClicked) {
+            return;
+        }
+        e.preventDefault();
+        const total = $progress.width();
+        const current = getProgressFromEvent(e);
+        $progressCurrent.width(current < total ? current : total);
+    }
+    $progress.on('mousedown touchstart', function (e) {
+        isProgressClicked = true;
+        moveProgress(e);
+    });
+    $(document)
+        .on('mouseup touchend', function (e) {
+            if (!isProgressClicked) {
+                return;
+            }
+            isProgressClicked = false;
+            const duration = audio.duration;
+            if (isNaN(duration)) {
+                $progressCurrent.width(0);
+                return;
+            }
+            const total = $progress.width();
+            const current = getProgressFromEvent(e);
+            if (current >= total) {
+                q.next();
+                return;
+            }
+            audio.currentTime = current > 0 ? duration * current / total: 0;
+            // todo 寻找歌词
+        })
+        .on('mousemove touchmove', moveProgress);
 
     function defineProperties(obj, properties) {
         const keys = Object.keys(properties);

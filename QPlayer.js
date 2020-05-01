@@ -4,7 +4,7 @@ $(function () {
     if (!window.QPlayer) {
         window.QPlayer = {};
     }
-    const q = window.QPlayer;
+    const q = window.QPlayer || (window.QPlayer = {});
     const v = {};
 
     const
@@ -29,6 +29,9 @@ $(function () {
 
     q.index = -1;
     q.current = null;
+    if (!q.provider) {
+        q.provider = {};
+    }
 
     function Random(index) {
         const _this = this;
@@ -125,12 +128,6 @@ $(function () {
         return q.index;
     }
 
-    function playAudio() {
-        onPlay();
-        audio.src = q.current.url;
-        audio.play();
-    }
-
     function onPlay() {
         $q.addClass('QPlayer-playing');
     }
@@ -164,6 +161,101 @@ $(function () {
         return $list.children(`:not(.QPlayer-list-error):eq(${index})`);
     }
 
+    function Provider(provider, current) {
+        const callbacks = new ProviderCallback();
+        let isStop;
+        this.call = function (name, success, error) {
+            if (!error) {
+                error = function () {}
+            }
+            const data = current[name];
+            if (data) {
+                success(data);
+                return;
+            }
+            const _success = function (data, cache) {
+                success(data);
+                if (cache) {
+                    current[name] = data;
+                }
+            };
+            const callback = provider[name];
+            if (callback === true) {
+                callbacks.set(name, _success, error);
+                return;
+            }
+            if (callback) {
+                callback(current, _success, error);
+                return;
+            }
+            error();
+        };
+        this.stop = function () {
+            isStop = true;
+        };
+        this.load = function () {
+            isStop = false;
+            const load = provider.load;
+            if (!load) {
+                return;
+            }
+            load(current, callbacks);
+        };
+
+        function ProviderCallback() {
+            const callbacks = {};
+            const caches = {};
+            this.success = function (name, data, cache) {
+                const callback = callbacks[name];
+                if (!callback) {
+                    caches[name] = {
+                        data: data,
+                        cache: cache
+                    };
+                    return;
+                }
+                callback.success(data, cache);
+            };
+            this.error = function (name) {
+                const callback = callbacks[name];
+                if (!callback) {
+                    caches[name] = false;
+                    return;
+                }
+                callback.error();
+            };
+            this.set = function (name, success, error) {
+                if (isStop) {
+                    return;
+                }
+                const cache = caches[name];
+                if (cache) {
+                    success(cache.data, cache.cache);
+                    return;
+                }
+                if (cache === false) {
+                    error();
+                    return;
+                }
+                callbacks[name] = {success: success, error: error};
+            };
+        }
+    }
+
+    function getProvider(current) {
+        const providerName = current.provider || 'netease';
+        if (typeof providerName === 'string') {
+            let provider = q.provider[providerName];
+            if (!provider) {
+                console.warn(`没有找到相应的 Provider：${providerName}`);
+                provider = {};
+            }
+            provider = current.provider = new Provider(provider, current);
+            provider.name = providerName;
+            return provider;
+        }
+        return providerName instanceof Provider ? providerName : new Provider({}, current);
+    }
     /**
      * 加载
      *
@@ -171,6 +263,11 @@ $(function () {
      * @return {boolean}
      */
     q.load = function(index) {
+        let current = q.current;
+        if (current) {
+            getProvider(current).stop();
+            audio.load();
+        }
         const length = v.list.length;
         if (length === 0) {
             console.warn('list 为空！');
@@ -184,17 +281,20 @@ $(function () {
         } else {
             index = getNextIndex();
         }
-        const current = v.list[index];
+        current = v.list[index];
         $name.text(current.name);
         $artist.text(current.artist);
-        $cover.attr('src', current.cover);
         $list.children('.QPlayer-list-current').removeClass('QPlayer-list-current');
         get$Li(index).addClass('QPlayer-list-current');
-        // todo 加载歌词
-
         q.index = index;
         q.current = current;
-        audio.load();
+        const provider = getProvider(current);
+        provider.call('cover', function (url) {
+            $cover.attr('src', url);
+        });
+        provider.call('lyric', function (url) {
+
+        });
         return true;
     };
 
@@ -206,11 +306,10 @@ $(function () {
      * @return {number}
      * 0 错误
      * 1 List 为空
-     * 2 成功
-     * 3 请求 API
+     * 2 播放音频
+     * 3 加载并播放音频
      */
     function play(index, isPrevious) {
-        // FIXME 递归栈溢出
         function error(index) {
             get$Li(index).addClass('QPlayer-list-error');
             v.list.splice(index, 1);
@@ -218,20 +317,6 @@ $(function () {
         }
         function errorSync() {
             error(index);
-        }
-        function errorAsync() {
-            const list = v.list;
-            const _index = list[index] === current ? index : list.indexOf(current);
-            if (_index === -1) {
-                console.warn('未找到索引');
-                return;
-            }
-            error(_index);
-            if (isPrevious) {
-                q.previous();
-            } else {
-                q.next();
-            }
         }
 
         if (index === false) {
@@ -251,41 +336,23 @@ $(function () {
             }
         }
 
-        const current = q.current;
-        if (current.url) {
-            playAudio();
-            return 2;
-        }
-        const id = current.id;
-        if (!id) {
-            errorSync();
-            return 0;
-        }
-        const source = current.source || 'netease';
-        if (source !== 'netease') {
-            console.warn('暂不支持源：' + source);
-            errorSync();
-            return 0;
-        }
         onPlayPrepare();
-        $.ajax({
-            dataType: 'jsonp',
-            url: 'https://api.littlehands.site/NeteaseMusic/',
-            data: {
-                type: 'song',
-                id: id
-            },
-            success: function (json) {
-                const url = json.url;
-                if (url) {
-                    current.url = url;
-                    playAudio();
-                } else {
-                    errorAsync();
-                }
-            },
-            error: function () {
-                errorAsync();
+        const current = q.current;
+        getProvider(current).call('audio', function (url) {
+            audio.src = url;
+            audio.play();
+        }, function () {
+            const list = v.list;
+            const _index = list[index] === current ? index : list.indexOf(current);
+            if (_index === -1) {
+                console.warn('未找到索引');
+                return;
+            }
+            error(_index);
+            if (isPrevious) {
+                q.previous();
+            } else {
+                q.next();
             }
         });
         return 3;
@@ -485,7 +552,7 @@ $(function () {
                 }
                 q.index= -1;
                 q.current = null;
-                q.load();
+                q.load(4);
             },
             default: []
         }

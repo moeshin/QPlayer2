@@ -218,9 +218,8 @@
 }
 #QPlayer-lyrics {
     float: left;
-    width: 150px;
+    width: 160px;
     height: 0;
-    border-radius: 0 8px 8px 0;
     overflow: auto;
     transition: height .8s;
 }
@@ -239,5 +238,8 @@
     top: 50%;
     transform: translateY(-50%);
     margin: 0;
+}
+#QPlayer-lyrics.QPlayer-lyrics-no p,
+#QPlayer-lyrics p.QPlayer-lyrics-current {
     color: #EE1122;
 }

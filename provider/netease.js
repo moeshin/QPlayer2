@@ -25,6 +25,24 @@
                 },
                 error: error
             });
+        },
+        lyrics: function (current, success) {
+            const id = current.id;
+            if (!id) {
+                return;
+            }
+            $.ajax({
+                dataType: 'jsonp',
+                url: 'https://api.littlehands.site/NeteaseMusic/',
+                data: {
+                    type: 'lyric',
+                    id: id
+                },
+                success: function (json) {
+                    // noinspection JSUnresolvedVariable
+                    success(json.lyric + json.tlyric);
+                }
+            });
         }
     };
 })();

@@ -17,12 +17,15 @@ $(function () {
         $more = $('#QPlayer-more'),
         $time = $('#QPlayer-time'),
         $progress = $('#QPlayer-progress'),
-        $progressCurrent = $('#QPlayer-progress-current')
+        $progressCurrent = $('#QPlayer-progress-current'),
+        $lyrics = $('#QPlayer-lyrics')
     ;
 
     const
         audio = $audio[0]
     ;
+
+    let $lyricsList;
 
     // Test
     window._audio = audio;
@@ -60,7 +63,7 @@ $(function () {
                     return this.list[this.index];
                 }
                 const index = getIndex();
-                this.list.splice(0, 0, index);
+                this.list.unshift(index);
                 return index;
             }
             if (this.index === -1) {
@@ -256,6 +259,127 @@ $(function () {
         }
         return providerName instanceof Provider ? providerName : new Provider({}, current);
     }
+
+    function Lyrics(lrc) {
+        this.time = [];
+        this.text = [];
+        this.index = -1;
+        this.nextTime = 0;
+        this.offset = 0;
+        this.has = false;
+        this.add = function (time, text) {
+            const length = this.time.length;
+            for (let i = 0; i < length; ++i) {
+                const t = this.time[i];
+                if (t < time) {
+                    continue;
+                }
+                if (t === time) {
+                    this.text[i] += '<br>' + text;
+                    return;
+                }
+                if (i !== length - 1) {
+                    this.time.splice(i, 0, time);
+                    this.text.splice(i, 0, text);
+                    return;
+                }
+            }
+            this.time[length] = time;
+            this.text[length] = text;
+        };
+        this.find = function (time) {
+            const length = this.time.length;
+            for (let i = 0; i < length; ++i) {
+                const t = this.time[i] + this.offset;
+                if (t < time) {
+                    continue;
+                }
+                if (t === time) {
+                    return i;
+                }
+                return i - 1;
+            }
+            return length - 1;
+        };
+        this.goto = function (index) {
+            if (this.index !== -1) {
+                $($lyricsList[this.index]).removeClass('QPlayer-lyrics-current');
+            }
+            this.nextTime = this.time[index + 1] + this.offset;
+            this.index = index;
+            if (index < 0) {
+                return;
+            }
+            const $current = $($lyricsList[index]).addClass('QPlayer-lyrics-current');
+            $lyrics.stop(true).animate({
+                scrollTop: $current.offset().top - $lyrics.offset().top + $lyrics.scrollTop()
+                    - ($lyrics.height() - $current.height()) / 2
+            });
+        };
+        this.next = function (time) {
+            if (isNaN(this.nextTime) || this.nextTime > time) {
+                return;
+            }
+            this.goto(this.index + 1);
+        };
+        this.show = function () {
+            const length = this.text.length;
+            if (length === 0) {
+                return;
+            }
+            let html = '';
+            for (let i = 0; i < length; ++i) {
+                html += `<p>${this.text[i]}</p>`;
+            }
+            $lyrics.removeClass('QPlayer-lyrics-no');
+            $lyrics.html(html);
+            $lyricsList = $lyrics.children();
+        };
+        const linePattern = /^/mg;
+        const timePattern = /\t*\[([0-6]?\d):([0-6]?\d)(?:\.(\d{1,3}))?]/g;
+        const textPattern = /.*/mg;
+        const offsetPattern = /^\[offset:\t*([+-]?\d+)]/mg;
+        while ((linePattern.exec(lrc)) !== null) {
+            const lineIndex = linePattern.lastIndex;
+            let result;
+            offsetPattern.lastIndex = lineIndex;
+            if ((result = offsetPattern.exec(lrc)) != null) {
+                linePattern.lastIndex = offsetPattern.lastIndex;
+                this.offset = parseFloat(result[1]);
+                continue;
+            }
+            let index = timePattern.lastIndex = lineIndex;
+            const times = [];
+            function isTime() {
+                return (result = timePattern.exec(lrc)) != null && result.index === index;
+            }
+            if (!isTime()) {
+                linePattern.lastIndex++;
+                continue;
+            }
+            do {
+                linePattern.lastIndex = textPattern.lastIndex = timePattern.lastIndex;
+                let time = parseInt(result[1]) * 60000 + parseInt(result[2]) * 1000;
+                const f = result[3];
+                if (f) {
+                    const length = f.length;
+                    time += parseInt(length < 3 ? f + '0'.repeat(3 - length) : f);
+                }
+                times.push(time);
+                index = timePattern.lastIndex;
+            } while (isTime());
+            if (times.length !== 0) {
+                const text = textPattern.exec(lrc)[0].trim();
+                const length = times.length;
+                for (let i = 0; i < length; ++i) {
+                    this.add(times[i], text);
+                }
+                continue;
+            }
+        }
+        this.has = this.time.length !== 0;
+    }
+
     /**
      * 加载
      *
@@ -286,14 +410,17 @@ $(function () {
         $artist.text(current.artist);
         $list.children('.QPlayer-list-current').removeClass('QPlayer-list-current');
         get$Li(index).addClass('QPlayer-list-current');
+        $lyrics.addClass('QPlayer-lyrics-no').html('<p>暂无歌词，请欣赏。</p>');
+        $lyricsList = null;
         q.index = index;
         q.current = current;
         const provider = getProvider(current);
         provider.call('cover', function (url) {
             $cover.attr('src', url);
         });
-        provider.call('lyric', function (url) {
-
+        provider.call('lyrics', function (lrc) {
+            current.lyrics = new Lyrics(lrc);
+            current.lyrics.show();
         });
         return true;
     };
@@ -411,6 +538,10 @@ $(function () {
         .on('timeupdate', function () {
             const time = audio.currentTime;
             $time.text(s2m(time));
+            const lyrics = q.current.lyrics;
+            if (lyrics && lyrics.has) {
+                lyrics.next(time * 1000);
+            }
             if (!isProgressClicked) {
                 $progressCurrent.width(100 * time / audio.duration + '%');
             }
@@ -466,8 +597,12 @@ $(function () {
                 q.next();
                 return;
             }
-            audio.currentTime = current > 0 ? duration * current / total: 0;
-            // todo 寻找歌词
+            const time = current > 0 ? duration * current / total: 0;
+            audio.currentTime = time;
+            const lyrics = q.current.lyrics;
+            if (lyrics && lyrics.has) {
+                lyrics.goto(lyrics.find(time * 1000));
+            }
         })
         .on('mousemove touchmove', moveProgress);
 

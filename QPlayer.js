@@ -399,11 +399,14 @@ $(function () {
         } else {
             index = getNextIndex();
         }
+        $list.children('.QPlayer-list-current').removeClass('QPlayer-list-current');
+        const $li = get$Li(index).addClass('QPlayer-list-current');
+        if (!current) {
+            $list.scrollTop($li.offset().top - $list.offset().top + 1);
+        }
         current = v.list[index];
         $name.text(current.name);
         $artist.text(current.artist);
-        $list.children('.QPlayer-list-current').removeClass('QPlayer-list-current');
-        get$Li(index).addClass('QPlayer-list-current');
         $lyrics.addClass('QPlayer-lyrics-no').html('<p>暂无歌词，请欣赏。</p>');
         $lyricsList = null;
         q.index = index;
@@ -421,6 +424,7 @@ $(function () {
             }
             current.lyrics.show();
         });
+        provider.load();
         return true;
     };
 
@@ -666,18 +670,17 @@ $(function () {
                 if (value.length === 0) {
                     return;
                 }
-                $list.empty();
                 const length = value.length;
+                let html = '';
                 for (let i = 0; i < length; i++) {
                     const item = value[i];
                     let artist = item.artist;
                     if (Array.isArray(artist)) {
                         item.artist = artist = artist.join('/');
                     }
-                    const $li = $(`<li><strong>${item.name}</strong><span>${artist}</span></li>`);
-                    $list.append($li);
-                    $li.prop('QPlayer', item);
+                    html += `<li><strong>${item.name}</strong><span>${artist}</span></li>`;
                 }
+                $list.html(html);
                 if (q.index > -1 && q.current) {
                     const length = value.length;
                     if (length > q.index && value[q.index] === q.current) {
@@ -689,7 +692,7 @@ $(function () {
                 }
                 q.index= -1;
                 q.current = null;
-                q.load(4);
+                q.load();
             },
             default: []
         }

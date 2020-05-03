@@ -25,7 +25,7 @@ $(function () {
         audio = $audio[0]
     ;
 
-    let $lyricsList, $listLi;
+    let $lyricsList, $listLi, errorCount;
 
     // Test
     window._audio = audio;
@@ -47,7 +47,7 @@ $(function () {
         }
         this.next = function () {
             if (this.index + 1 === this.list.length) {
-                if (this.list.length === v.list.length) {
+                if (this.list.length >= v.list.length - errorCount) {
                     this.index = 0;
                     return _this.list[0];
                 }
@@ -348,7 +348,7 @@ $(function () {
                 return (result = timePattern.exec(lrc)) != null && result.index === index;
             }
             if (!isTime()) {
-                linePattern.lastIndex++;
+                ++linePattern.lastIndex;
                 continue;
             }
             do {
@@ -377,6 +377,7 @@ $(function () {
     function errorWithIndex(index) {
         getListLi(index).addClass('QPlayer-list-error');
         q.random.remove(index);
+        ++errorCount;
     }
 
     /**
@@ -418,12 +419,18 @@ $(function () {
         q.current = current;
         const provider = getProvider(current);
         provider.call('cover', function (url, cache) {
+            if (!url) {
+                return;
+            }
             $cover.attr('src', url);
             if (cache) {
                current.cover = url;
             }
         });
         provider.call('lyrics', function (lrc) {
+            if (!lrc) {
+                return;
+            }
             if (!(lrc instanceof Lyrics)) {
                 current.lyrics = new Lyrics(lrc);
             }
@@ -464,13 +471,7 @@ $(function () {
 
         onPlayPrepare();
         const current = q.current;
-        getProvider(current).call('audio', function (url, cache) {
-            if (cache) {
-                current.audio = cache;
-            }
-            audio.src = url;
-            audio.play();
-        }, function () {
+        function error() {
             const list = v.list;
             const _index = list[index] === current ? index : list.indexOf(current);
             if (_index === -1) {
@@ -483,7 +484,18 @@ $(function () {
             } else {
                 q.next();
             }
-        });
+        }
+        getProvider(current).call('audio', function (url, cache) {
+            if (!url) {
+                error();
+                return;
+            }
+            if (cache) {
+                current.audio = cache;
+            }
+            audio.src = url;
+            audio.play();
+        }, error);
         return 3;
     }
 
@@ -676,7 +688,7 @@ $(function () {
                 }
                 const length = value.length;
                 let html = '';
-                for (let i = 0; i < length; i++) {
+                for (let i = 0; i < length; ++i) {
                     const item = value[i];
                     let artist = item.artist;
                     if (Array.isArray(artist)) {
@@ -697,6 +709,7 @@ $(function () {
                 }
                 q.index= -1;
                 q.current = null;
+                errorCount = 0;
                 q.load();
             },
             default: []

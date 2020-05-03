@@ -25,7 +25,7 @@ $(function () {
         audio = $audio[0]
     ;
 
-    let $lyricsList, $listLi, errorCount;
+    let $lyricsList, $listLi, isLoadPause, isPrevisionPlay;
 
     // Test
     window._audio = audio;
@@ -47,7 +47,7 @@ $(function () {
         }
         this.next = function () {
             if (this.index + 1 === this.list.length) {
-                if (this.list.length >= v.list.length - errorCount) {
+                if (this.list.length >= v.list.length) {
                     this.index = 0;
                     return _this.list[0];
                 }
@@ -71,15 +71,15 @@ $(function () {
             }
             return this.list[--this.index];
         };
-        this.remove = function (index) {
-            const list = this.list;
-            const _index = list.indexOf(index);
-            if (_index === -1) {
-                return false;
-            }
-            list.splice(_index, 1);
-            --this.index;
-        };
+        // this.remove = function (index) {
+        //     const list = this.list;
+        //     const _index = list.indexOf(index);
+        //     if (_index === -1) {
+        //         return false;
+        //     }
+        //     list.splice(_index, 1);
+        //     --this.index;
+        // };
         function push() {
             const index = getIndex();
             _this.list.push(index);
@@ -135,12 +135,11 @@ $(function () {
         $q.addClass('QPlayer-playing');
     }
 
-    function onPlayPrepare() {
-        $progressCurrent.width('0');
-        onPlay();
-    }
-
     function onPause() {
+        if (isLoadPause) {
+            isLoadPause = false;
+            return;
+        }
         $q.removeClass('QPlayer-playing');
     }
 
@@ -377,8 +376,6 @@ $(function () {
 
     function errorWithIndex(index) {
         getListLi(index).addClass('QPlayer-list-error');
-        q.random.remove(index);
-        ++errorCount;
     }
 
     /**
@@ -391,7 +388,8 @@ $(function () {
         let current = q.current;
         if (current) {
             getProvider(current).stop();
-            audio.load();
+            isLoadPause = true;
+            audio.pause();
         }
         const length = v.list.length;
         if (length === 0) {
@@ -415,6 +413,7 @@ $(function () {
         $name.text(current.name);
         $artist.text(current.artist);
         $lyrics.addClass('QPlayer-lyrics-no').html('<p>暂无歌词，请欣赏。</p>');
+        $progressCurrent.width('0');
         $lyricsList = null;
         q.index = index;
         q.current = current;
@@ -453,6 +452,7 @@ $(function () {
      * 3 加载并播放音频
      */
     function play(index, isPrevious) {
+        isPrevisionPlay = isPrevious;
         if (index === false) {
             console.warn('list 为空！');
             return 1;
@@ -470,7 +470,7 @@ $(function () {
             }
         }
 
-        onPlayPrepare();
+        onPlay();
         const current = q.current;
         function error() {
             const list = v.list;
@@ -495,6 +495,7 @@ $(function () {
                 current.audio = cache;
             }
             audio.src = url;
+            audio.load();
             audio.play();
         }, error);
         return 3;
@@ -567,7 +568,11 @@ $(function () {
             if (index !== -1) {
                 errorWithIndex(index);
             }
-            q.play();
+            if (isPrevisionPlay) {
+                q.previous();
+            } else {
+                q.next();
+            }
         })
     ;
 
@@ -710,7 +715,6 @@ $(function () {
                 }
                 q.index= -1;
                 q.current = null;
-                errorCount = 0;
                 q.load();
             },
             default: []

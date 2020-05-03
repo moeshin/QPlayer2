@@ -25,7 +25,7 @@ $(function () {
         audio = $audio[0]
     ;
 
-    let $lyricsList;
+    let $lyricsList, $listLi;
 
     // Test
     window._audio = audio;
@@ -160,8 +160,8 @@ $(function () {
         return $q.hasClass('QPlayer-playing');
     }
 
-    function get$Li(index) {
-        return $list.children(`:not(.QPlayer-list-error):eq(${index})`);
+    function getListLi(index) {
+        return $listLi.eq(index);
     }
 
     function Provider(provider, current) {
@@ -374,6 +374,11 @@ $(function () {
         this.has = this.time.length !== 0;
     }
 
+    function errorWithIndex(index) {
+        getListLi(index).addClass('QPlayer-list-error');
+        q.random.remove(index);
+    }
+
     /**
      * 加载
      *
@@ -400,7 +405,7 @@ $(function () {
             index = getNextIndex();
         }
         $list.children('.QPlayer-list-current').removeClass('QPlayer-list-current');
-        const $li = get$Li(index).addClass('QPlayer-list-current');
+        const $li = getListLi(index).addClass('QPlayer-list-current');
         if (!current) {
             $list.scrollTop($li.offset().top - $list.offset().top + 1);
         }
@@ -440,21 +445,12 @@ $(function () {
      * 3 加载并播放音频
      */
     function play(index, isPrevious) {
-        function error(index) {
-            get$Li(index).addClass('QPlayer-list-error');
-            v.list.splice(index, 1);
-            q.random.remove(index);
-        }
-        function errorSync() {
-            error(index);
-        }
-
         if (index === false) {
             console.warn('list 为空！');
             return 1;
         } else if (typeof index === 'number') {
             if (!q.load(index)) {
-                errorSync();
+                errorWithIndex(index);
                 return 0;
             }
         } else {
@@ -481,7 +477,7 @@ $(function () {
                 console.warn('未找到索引');
                 return;
             }
-            error(_index);
+            errorWithIndex(_index);
             if (isPrevious) {
                 q.previous();
             } else {
@@ -530,8 +526,8 @@ $(function () {
     });
     $('#QPlayer-btn-next').click(q.next);
     $('#QPlayer-btn-previous').click(q.previous);
-    $list.on('click', 'li:not(.QPlayer-list-current, .QPlayer-list-error)', function () {
-        const index = $list.children(':not(.QPlayer-list-error)').index(this);
+    $list.on('click', 'li:not(.QPlayer-list-current)', function () {
+        const index = $(this).index();
         if (q.isRandom) {
             q.random = new Random(index);
         }
@@ -551,6 +547,14 @@ $(function () {
             if (!isProgressClicked) {
                 $progressCurrent.width(100 * time / audio.duration + '%');
             }
+        })
+        .on('error', function () {
+            console.log('error', arguments);
+            const index = v.list.indexOf(q.current);
+            if (index !== -1) {
+                errorWithIndex(index);
+            }
+            q.play();
         })
     ;
 
@@ -681,6 +685,7 @@ $(function () {
                     html += `<li><strong>${item.name}</strong><span>${artist}</span></li>`;
                 }
                 $list.html(html);
+                $listLi = $list.children();
                 if (q.index > -1 && q.current) {
                     const length = value.length;
                     if (length > q.index && value[q.index] === q.current) {

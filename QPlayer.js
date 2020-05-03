@@ -176,19 +176,13 @@ $(function () {
                 success(data);
                 return;
             }
-            const _success = function (data, cache) {
-                success(data);
-                if (cache) {
-                    current[name] = data;
-                }
-            };
             const callback = provider[name];
             if (callback === true) {
-                callbacks.set(name, _success, error);
+                callbacks.set(name, success, error);
                 return;
             }
             if (callback) {
-                callback(current, _success, error);
+                callback(current, success, error);
                 return;
             }
             error();
@@ -368,13 +362,13 @@ $(function () {
                 times.push(time);
                 index = timePattern.lastIndex;
             } while (isTime());
-            if (times.length !== 0) {
-                const text = textPattern.exec(lrc)[0].trim();
-                const length = times.length;
-                for (let i = 0; i < length; ++i) {
-                    this.add(times[i], text);
-                }
+            if (times.length === 0) {
                 continue;
+            }
+            const text = textPattern.exec(lrc)[0].trim();
+            const length = times.length;
+            for (let i = 0; i < length; ++i) {
+                this.add(times[i], text);
             }
         }
         this.has = this.time.length !== 0;
@@ -415,11 +409,16 @@ $(function () {
         q.index = index;
         q.current = current;
         const provider = getProvider(current);
-        provider.call('cover', function (url) {
+        provider.call('cover', function (url, cache) {
             $cover.attr('src', url);
+            if (cache) {
+               current.cover = url;
+            }
         });
         provider.call('lyrics', function (lrc) {
-            current.lyrics = new Lyrics(lrc);
+            if (!(lrc instanceof Lyrics)) {
+                current.lyrics = new Lyrics(lrc);
+            }
             current.lyrics.show();
         });
         return true;
@@ -465,7 +464,10 @@ $(function () {
 
         onPlayPrepare();
         const current = q.current;
-        getProvider(current).call('audio', function (url) {
+        getProvider(current).call('audio', function (url, cache) {
+            if (cache) {
+                current.audio = cache;
+            }
             audio.src = url;
             audio.play();
         }, function () {

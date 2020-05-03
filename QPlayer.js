@@ -328,6 +328,7 @@ $(function () {
             $lyrics.removeClass('QPlayer-lyrics-no');
             $lyrics.html(html);
             $lyricsList = $lyrics.children();
+            this.goto(-1);
         };
         const linePattern = /^/mg;
         const timePattern = /\t*\[([0-6]?\d):([0-6]?\d)(?:\.(\d{1,3}))?]/g;

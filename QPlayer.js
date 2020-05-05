@@ -25,7 +25,7 @@ $(function () {
         audio = $audio[0]
     ;
 
-    let $lyricsList, $listLi, isLoadPause, isPrevisionPlay;
+    let $lyricsList, $listLi, isLoadPause, isPrevisionPlay, errorStartIndex, isAllError;
 
     // Test
     window._audio = audio;
@@ -153,10 +153,6 @@ $(function () {
             s = `0${s}`;
         }
         return `${m}:${s}`;
-    }
-
-    function isPlaying() {
-        return $q.hasClass('QPlayer-playing');
     }
 
     function getListLi(index) {
@@ -375,7 +371,34 @@ $(function () {
     }
 
     function errorWithIndex(index) {
+        if (errorStartIndex === index) {
+            isAllError = true;
+            init();
+            q.pause();
+            return true;
+        }
+        if (errorStartIndex === -1) {
+            errorStartIndex = index;
+        }
         getListLi(index).addClass('QPlayer-list-error');
+        return false;
+    }
+
+    function initLoad() {
+        $lyrics.addClass('QPlayer-lyrics-no').html('<p>无歌词，请欣赏。</p>');
+        $lyricsList = null;
+        $progressCurrent.width('0');
+        $cover.prop('src', 'https://p4.music.126.net/7VJn16zrictuj5kdfW1qHA==/3264450024433083.jpg?param=0x64');
+        $artist.text('未知');
+    }
+
+    function init() {
+        q.index= -1;
+        q.current = null;
+        initLoad();
+        $name.text('没有歌曲');
+        isLoadPause = false;
+        errorStartIndex = -1;
     }
 
     /**
@@ -385,6 +408,7 @@ $(function () {
      * @return {boolean}
      */
     q.load = function(index) {
+        isAllError = false;
         let current = q.current;
         if (current) {
             getProvider(current).stop();
@@ -409,17 +433,15 @@ $(function () {
         if (!current) {
             $list.scrollTop($li.offset().top - $list.offset().top + 1);
         }
+        initLoad();
         current = v.list[index];
         $name.text(current.name);
         $artist.text(current.artist);
-        $lyrics.addClass('QPlayer-lyrics-no').html('<p>暂无歌词，请欣赏。</p>');
-        $progressCurrent.width('0');
-        $lyricsList = null;
         q.index = index;
         q.current = current;
         const provider = getProvider(current);
         provider.call('cover', function (url, cache) {
-            if (!url) {
+            if (isAllError || !url) {
                 return;
             }
             $cover.attr('src', url);
@@ -428,7 +450,7 @@ $(function () {
             }
         });
         provider.call('lyrics', function (lrc) {
-            if (!lrc) {
+            if (isAllError || !lrc) {
                 return;
             }
             if (!(lrc instanceof Lyrics)) {
@@ -450,6 +472,7 @@ $(function () {
      * 1 List 为空
      * 2 播放音频
      * 3 加载并播放音频
+     * 4 全部错误无法播放
      */
     function play(index, isPrevious) {
         isPrevisionPlay = isPrevious;
@@ -458,8 +481,7 @@ $(function () {
             return 1;
         } else if (typeof index === 'number') {
             if (!q.load(index)) {
-                errorWithIndex(index);
-                return 0;
+                return errorWithIndex(index) ? 4 : 0;
             }
         } else {
             index = q.index;
@@ -468,6 +490,9 @@ $(function () {
                 audio.play();
                 return 2;
             }
+        }
+        if (index === -1) {
+            return 0;
         }
 
         onPlay();
@@ -479,7 +504,9 @@ $(function () {
                 console.warn('未找到索引');
                 return;
             }
-            errorWithIndex(_index);
+            if (errorWithIndex(_index)) {
+                return;
+            }
             if (isPrevious) {
                 q.previous();
             } else {
@@ -487,6 +514,9 @@ $(function () {
             }
         }
         getProvider(current).call('audio', function (url, cache) {
+            if (isAllError) {
+                return;
+            }
             if (!url) {
                 error();
                 return;
@@ -532,7 +562,7 @@ $(function () {
         $more.toggleClass('QPlayer-lyrics-show');
     });
     $('#QPlayer-btn-play').click(function () {
-        if (isPlaying()) {
+        if ($q.hasClass('QPlayer-playing')) {
             q.pause();
         } else {
             q.play();
@@ -565,14 +595,17 @@ $(function () {
         .on('error', function () {
             console.log('error', arguments);
             const index = v.list.indexOf(q.current);
-            if (index !== -1) {
-                errorWithIndex(index);
+            if (index !== -1 && errorWithIndex(index)) {
+                return;
             }
             if (isPrevisionPlay) {
                 q.previous();
             } else {
                 q.next();
             }
+        })
+        .on('canplay', function () {
+            errorStartIndex = -1;
         })
     ;
 
@@ -634,6 +667,9 @@ $(function () {
         })
         .on('mousemove touchmove', moveProgress);
 
+    init();
+    $list.html('<li class="QPlayer-list-current">没有歌曲</li>');
+
     function defineProperties(obj, properties) {
         const keys = Object.keys(properties);
         const length = keys.length;
@@ -655,9 +691,7 @@ $(function () {
             },
             set: function (bool) {
                 v.isRandom = bool;
-                if (bool) {
-                    q.random = new Random();
-                }
+                q.random = bool ? new Random() : null;
             },
             default: false
         },
@@ -667,10 +701,6 @@ $(function () {
             },
             set: function (value) {
                 v.isRotate = value;
-                if (!$cover.length) {
-                    console.warn('找不到 QPlayer！');
-                    return;
-                }
                 if (value) {
                     $cover.addClass('QPlayer-cover-rotate');
                 } else {
@@ -713,8 +743,7 @@ $(function () {
                         return;
                     }
                 }
-                q.index= -1;
-                q.current = null;
+                init();
                 q.load();
             },
             default: []

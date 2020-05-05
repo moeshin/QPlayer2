@@ -188,6 +188,7 @@
     width: 264px;
     padding: 0;
     margin: 0;
+    border: 1px solid #DEDEDE;
     overflow: auto;
     transition: max-height .8s;
 }

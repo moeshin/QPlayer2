@@ -38,7 +38,7 @@ $(function () {
         q.provider = {};
     }
 
-    function Random(index) {
+    function Shuffle(index) {
         const _this = this;
         if (index === undefined) {
             this.index = -1;
@@ -111,8 +111,8 @@ $(function () {
         if (v.list.length === 0) {
             return false;
         }
-        if (q.isRandom) {
-            return q.random.next();
+        if (q.isShuffle) {
+            return q.shuffle.next();
         }
         if (++q.index === q.list.length) {
             q.index = 0;
@@ -124,8 +124,8 @@ $(function () {
         if (v.list.length === 0) {
             return false;
         }
-        if (q.isRandom) {
-            return q.random.previous();
+        if (q.isShuffle) {
+            return q.shuffle.previous();
         }
         if (--q.index < 0) {
             q.index = q.list.length - 1;
@@ -579,12 +579,12 @@ $(function () {
         q.isRotate = !v.isRotate;
     });
     $mode.click(function () {
-        q.isRandom = !v.isRandom
+        q.isShuffle = !v.isShuffle
     });
     $list.on('click', 'li:not(.QPlayer-list-current)', function () {
         const index = $(this).index();
-        if (q.isRandom) {
-            q.random = new Random(index);
+        if (q.isShuffle) {
+            q.shuffle = new Shuffle(index);
         }
         q.play(index);
     });
@@ -717,19 +717,19 @@ $(function () {
     }
 
     defineProperties(q,{
-        isRandom: {
+        isShuffle: {
             get: function () {
-                return v.isRandom;
+                return v.isShuffle;
             },
             set: function (value) {
-                v.isRandom = value;
-                setBoolFromLocalStorage('isRandom', value);
+                v.isShuffle = value;
+                setBoolFromLocalStorage('isShuffle', value);
                 if (value) {
                     $mode.addClass('QPlayer-shuffle');
-                    q.random = new Random();
+                    q.shuffle = new Shuffle();
                 } else {
                     $mode.removeClass('QPlayer-shuffle');
-                    q.random = null;
+                    q.shuffle = null;
                 }
             },
             type: 'bool',

@@ -390,6 +390,7 @@ $(function () {
         $lyrics.addClass('QPlayer-lyrics-no').html('<p>无歌词，请欣赏。</p>');
         $lyricsList = null;
         $progressCurrent.width('0');
+        audio.currentTime = 0;
         $cover.addClass('QPlayer-cover-no');
         $cover.offset();
         $artist.text('未知');
@@ -418,6 +419,7 @@ $(function () {
             isLoadPause = true;
             audio.pause();
         }
+        initLoad();
         const length = v.list.length;
         if (length === 0) {
             console.warn('list 为空！');
@@ -436,7 +438,6 @@ $(function () {
         if (!current) {
             $list.scrollTop($li.offset().top - $list.offset().top + 1);
         }
-        initLoad();
         current = v.list[index];
         $name.text(current.name);
         $artist.text(current.artist);
@@ -680,6 +681,23 @@ $(function () {
     init();
     $list.html('<li class="QPlayer-list-current">没有歌曲</li>');
 
+    function getLocalStorageName(name) {
+        return 'QPlayer-' + name;
+    }
+
+    function getBoolFromLocalStorage(name) {
+        const value = localStorage.getItem(getLocalStorageName(name));
+        return !!(value && value !== 'false');
+    }
+
+    function setBoolFromLocalStorage(name, value) {
+        localStorage.setItem(getLocalStorageName(name), value);
+    }
+
+    function hasLocalStorageName(name) {
+        return localStorage.hasOwnProperty(getLocalStorageName(name));
+    }
+
     function defineProperties(obj, properties) {
         const keys = Object.keys(properties);
         const length = keys.length;
@@ -690,6 +708,10 @@ $(function () {
         Object.defineProperties(obj, properties);
         for (let i = 0; i < length; ++i) {
             const key = keys[i];
+            if (properties[key].type === 'bool' && hasLocalStorageName(key)) {
+                obj[key] = getBoolFromLocalStorage(key);
+                continue;
+            }
             obj[key] = v[key] || properties[key].default;
         }
     }
@@ -699,9 +721,10 @@ $(function () {
             get: function () {
                 return v.isRandom;
             },
-            set: function (bool) {
-                v.isRandom = bool;
-                if (bool) {
+            set: function (value) {
+                v.isRandom = value;
+                setBoolFromLocalStorage('isRandom', value);
+                if (value) {
                     $mode.addClass('QPlayer-shuffle');
                     q.random = new Random();
                 } else {
@@ -709,6 +732,7 @@ $(function () {
                     q.random = null;
                 }
             },
+            type: 'bool',
             default: false
         },
         isRotate: {
@@ -717,12 +741,14 @@ $(function () {
             },
             set: function (value) {
                 v.isRotate = value;
+                setBoolFromLocalStorage('isRotate', value);
                 if (value) {
                     $cover.addClass('QPlayer-cover-rotate');
                 } else {
                     $cover.removeClass('QPlayer-cover-rotate');
                 }
             },
+            type: 'bool',
             default: true
         },
         list: {
@@ -762,6 +788,7 @@ $(function () {
                 init();
                 q.load();
             },
+            type: 'list',
             default: []
         }
     });

@@ -237,7 +237,8 @@ $(function () {
     }
 
     function getProvider(current) {
-        const providerName = current.provider || 'netease';
+        // noinspection JSUnresolvedVariable
+        const providerName = current.provider || q.defaultProvider;
         if (typeof providerName === 'string') {
             let provider = q.provider[providerName];
             if (!provider) {

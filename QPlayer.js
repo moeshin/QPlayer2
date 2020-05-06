@@ -419,10 +419,10 @@ $(function () {
     /**
      * 加载
      *
-     * @param index
+     * @param {Number} index
      * @return {boolean}
      */
-    q.load = function(index) { // todo 保存到 Shuffle
+    q.load = function(index) {
         isAllError = false;
         let current = q.current;
         if (current) {
@@ -436,13 +436,9 @@ $(function () {
             console.warn('list 为空！');
             return false;
         }
-        if (typeof index === 'number') {
-            if (!(length > index || index > 0)) {
-                console.warn(`超出 list，length=${length}，index=${index}`);
-                return false;
-            }
-        } else {
-            index = getNextIndex();
+        if (!(length > index || index > 0)) {
+            console.warn(`超出 list，length=${length}，index=${index}`);
+            return false;
         }
         $list.children('.QPlayer-list-current').removeClass('QPlayer-list-current');
         const $li = getListLi(index).addClass('QPlayer-list-current');
@@ -555,7 +551,7 @@ $(function () {
         return 3;
     }
 
-    q.play = function(index, isPrevious) {
+    q.play = function (index, isPrevious) {
         const bool = play(index, isPrevious);
         if (bool) {
             return bool;
@@ -563,12 +559,12 @@ $(function () {
         return isPrevious ? q.previous() : q.next();
     };
 
-    q.pause = function() {
+    q.pause = function () {
         onPause();
         audio.pause();
     };
 
-    q.next = function() {
+    q.next = function () {
         return q.play(getNextIndex());
     };
 
@@ -602,7 +598,7 @@ $(function () {
     });
     $list.on('click', 'li:not(.QPlayer-list-current)', function () {
         const index = $(this).index();
-        if (q.isShuffle) {
+        if (v.isShuffle) {
             q.shuffle = new Shuffle(index);
         }
         q.play(index);
@@ -745,7 +741,8 @@ $(function () {
                 setBoolFromLocalStorage('isShuffle', value);
                 if (value) {
                     $mode.addClass('QPlayer-shuffle');
-                    q.shuffle = new Shuffle();
+                    const index = q.index;
+                    q.shuffle = new Shuffle(index === -1 ? undefined : index);
                 } else {
                     $mode.removeClass('QPlayer-shuffle');
                     q.shuffle = null;
@@ -805,7 +802,8 @@ $(function () {
                     }
                 }
                 init();
-                q.load();
+                // noinspection JSCheckFunctionSignatures
+                q.load(getNextIndex());
             },
             type: 'list',
             default: []

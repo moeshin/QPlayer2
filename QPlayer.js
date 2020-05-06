@@ -11,6 +11,7 @@ $(function () {
         $q = $('#QPlayer'),
         $audio = $('#QPlayer-audio'),
         $cover = $('#QPlayer-cover'),
+        $coverImg = $('#QPlayer-cover-img'),
         $list = $('#QPlayer-list'),
         $name = $('#QPlayer-name'),
         $artist = $('#QPlayer-artist'),
@@ -388,7 +389,8 @@ $(function () {
         $lyrics.addClass('QPlayer-lyrics-no').html('<p>无歌词，请欣赏。</p>');
         $lyricsList = null;
         $progressCurrent.width('0');
-        $cover.prop('src', 'https://p4.music.126.net/7VJn16zrictuj5kdfW1qHA==/3264450024433083.jpg?param=0x64');
+        $cover.addClass('QPlayer-cover-no');
+        $cover.offset();
         $artist.text('未知');
     }
 
@@ -444,7 +446,8 @@ $(function () {
             if (isAllError || !url) {
                 return;
             }
-            $cover.attr('src', url);
+            $coverImg.attr('src', url);
+            $cover.removeClass('QPlayer-cover-no');
             if (cache) {
                current.cover = url;
             }
@@ -570,6 +573,9 @@ $(function () {
     });
     $('#QPlayer-btn-next').click(q.next);
     $('#QPlayer-btn-previous').click(q.previous);
+    $cover.click(function () {
+        q.isRotate = !v.isRotate;
+    });
     $list.on('click', 'li:not(.QPlayer-list-current)', function () {
         const index = $(this).index();
         if (q.isRandom) {

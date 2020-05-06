@@ -72,15 +72,6 @@ $(function () {
             }
             return this.list[--this.index];
         };
-        // this.remove = function (index) {
-        //     const list = this.list;
-        //     const _index = list.indexOf(index);
-        //     if (_index === -1) {
-        //         return false;
-        //     }
-        //     list.splice(_index, 1);
-        //     --this.index;
-        // };
         function push() {
             const index = getIndex();
             _this.list.push(index);

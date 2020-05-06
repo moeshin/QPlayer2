@@ -19,7 +19,8 @@ $(function () {
         $time = $('#QPlayer-time'),
         $progress = $('#QPlayer-progress'),
         $progressCurrent = $('#QPlayer-progress-current'),
-        $lyrics = $('#QPlayer-lyrics')
+        $lyrics = $('#QPlayer-lyrics'),
+        $mode = $('#QPlayer-btn-mode')
     ;
 
     const
@@ -576,6 +577,9 @@ $(function () {
     $cover.click(function () {
         q.isRotate = !v.isRotate;
     });
+    $mode.click(function () {
+        q.isRandom = !v.isRandom
+    });
     $list.on('click', 'li:not(.QPlayer-list-current)', function () {
         const index = $(this).index();
         if (q.isRandom) {
@@ -697,7 +701,13 @@ $(function () {
             },
             set: function (bool) {
                 v.isRandom = bool;
-                q.random = bool ? new Random() : null;
+                if (bool) {
+                    $mode.addClass('QPlayer-shuffle');
+                    q.random = new Random();
+                } else {
+                    $mode.removeClass('QPlayer-shuffle');
+                    q.random = null;
+                }
             },
             default: false
         },

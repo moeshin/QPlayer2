@@ -134,28 +134,40 @@
     position: relative;
     width: 64px;
     height: 18px;
-    margin: 0 auto;
+    margin-left: 46px;
 }
 #QPlayer-btn-play {
     display: block;
     width: 18px;
     margin: 0 auto;
 }
-#QPlayer-btn-play svg {
+#QPlayer-btn-play svg,
+#QPlayer-btn-mode svg {
     position: absolute;
     width: 18px;
     height: 18px;
     transition: opacity .2s cubic-bezier(1, 0, 1, 1), transform .2s linear, visibility .2s linear, fill .2s linear;
 }
-#QPlayer-play, .QPlayer-playing #QPlayer-pause {
+#QPlayer-play,
+.QPlayer-playing #QPlayer-pause,
+#QPlayer-btn-repeat,
+.QPlayer-shuffle #QPlayer-btn-shuffle
+ {
     visibility: visible;
     opacity: 1;
 }
-#QPlayer-pause, .QPlayer-playing #QPlayer-play {
+#QPlayer-pause,
+.QPlayer-playing #QPlayer-play,
+#QPlayer-btn-shuffle,
+.QPlayer-shuffle #QPlayer-btn-repeat {
     visibility: hidden;
     opacity: 0;
 }
-.QPlayer-playing #QPlayer-btn-play svg  {
+#QPlayer-btn-mode.QPlayer-shuffle svg {
+    transform: rotate(0);
+}
+.QPlayer-playing #QPlayer-btn-play svg,
+#QPlayer-btn-mode svg {
     transform: rotate(-180deg);
 }
 #QPlayer-btn-previous, #QPlayer-btn-next {
@@ -172,9 +184,13 @@
     top: 0;
     right: 0;
 }
-#QPlayer-control-more svg {
+#QPlayer-control-more > * {
     width: 18px;
     height: 18px;
+}
+#QPlayer-btn-mode {
+    position: relative;
+    float: left;
 }
 .QPlayer-show#QPlayer {
     transform: translateX(264px);

@@ -13,8 +13,7 @@ $(function () {
         $cover = $('#QPlayer-cover'),
         $coverImg = $('#QPlayer-cover-img'),
         $list = $('#QPlayer-list'),
-        $name = $('#QPlayer-name'),
-        $artist = $('#QPlayer-artist'),
+        $title = $('#QPlayer-title'),
         $more = $('#QPlayer-more'),
         $time = $('#QPlayer-time'),
         $progress = $('#QPlayer-progress'),
@@ -135,6 +134,7 @@ $(function () {
 
     function onPlay() {
         $q.addClass('QPlayer-playing');
+        $title.marquee('resume');
     }
 
     function onPause() {
@@ -143,6 +143,7 @@ $(function () {
             return;
         }
         $q.removeClass('QPlayer-playing');
+        $title.marquee('pause');
     }
 
     function s2m(s) {
@@ -394,16 +395,25 @@ $(function () {
         audio.currentTime = 0;
         $cover.addClass('QPlayer-cover-no');
         $cover.offset();
-        $artist.text('未知');
+        $title.marquee('destroy');
     }
 
     function init() {
         q.index= -1;
         q.current = null;
         initLoad();
-        $name.text('没有歌曲');
+        $title.html('<strong>没有歌曲</strong>');
         isLoadPause = false;
         errorStartIndex = -1;
+    }
+
+    function isNeedMarquee() {
+        let width = 0;
+        // noinspection JSUnresolvedFunction
+        $title.children().each(function () {
+            width += $(this).width();
+        });
+        return width > $title.width();
     }
 
     /**
@@ -412,7 +422,7 @@ $(function () {
      * @param index
      * @return {boolean}
      */
-    q.load = function(index) {
+    q.load = function(index) { // todo 保存到 Shuffle
         isAllError = false;
         let current = q.current;
         if (current) {
@@ -440,8 +450,16 @@ $(function () {
             $list.scrollTop($li.offset().top - $list.offset().top + 1);
         }
         current = v.list[index];
-        $name.text(current.name);
-        $artist.text(current.artist);
+        $title.html(`<strong>${current.name}</strong><span> - ${current.artist}</span>`);
+        if (isNeedMarquee()) {
+            $title.marquee({
+                duration: 10000,
+                gap: 40,
+                delayBeforeStart: 1000,
+                duplicated: true,
+                startVisible: true,
+            }).marquee('pause');
+        }
         q.index = index;
         q.current = current;
         const provider = getProvider(current);

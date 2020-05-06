@@ -1,13 +1,12 @@
-window.QPlayer = {isRotate: true};
 $(function () {
 
     if (!window.QPlayer) {
         window.QPlayer = {};
     }
-    const q = window.QPlayer || (window.QPlayer = {});
-    const v = {};
+    var q = window.QPlayer || (window.QPlayer = {});
+    var v = {};
 
-    const
+    var
         $q = $('#QPlayer'),
         $audio = $('#QPlayer-audio'),
         $cover = $('#QPlayer-cover'),
@@ -22,14 +21,11 @@ $(function () {
         $mode = $('#QPlayer-btn-mode')
     ;
 
-    const
+    var
         audio = $audio[0]
     ;
 
-    let $lyricsList, $listLi, isLoadPause, isPrevisionPlay, errorStartIndex, isAllError;
-
-    // Test
-    window._audio = audio;
+    var $lyricsList, $listLi, isLoadPause, isPrevisionPlay, errorStartIndex, isAllError;
 
     q.index = -1;
     q.current = null;
@@ -38,7 +34,7 @@ $(function () {
     }
 
     function Shuffle(index) {
-        const _this = this;
+        var _this = this;
         if (index === undefined) {
             this.index = -1;
             this.list = [];
@@ -58,12 +54,12 @@ $(function () {
         };
         this.previous = function () {
             if (this.index === 0) {
-                const length = v.list.length;
+                var length = v.list.length;
                 if (this.list.length === length) {
                     this.index = length - 1;
                     return this.list[this.index];
                 }
-                const index = getIndex();
+                var index = getIndex();
                 this.list.unshift(index);
                 return index;
             }
@@ -73,18 +69,18 @@ $(function () {
             return this.list[--this.index];
         };
         function push() {
-            const index = getIndex();
+            var index = getIndex();
             _this.list.push(index);
             ++_this.index;
             return index;
         }
         function getIndex() {
-            const length = v.list.length;
+            var length = v.list.length;
             if (_this.index === -1) {
                 return random(length);
             }
-            const list = [];
-            for (let i = 0; i < length; ++i) {
+            var list = [];
+            for (var i = 0; i < length; ++i) {
                 if (_this.list.includes(i)) {
                     continue;
                 }
@@ -138,15 +134,15 @@ $(function () {
     }
 
     function s2m(s) {
-        let m = Math.floor(s / 60);
+        var m = Math.floor(s / 60);
         s = Math.floor(s % 60);
         if (m < 10) {
-            m = `0${m}`;
+            m = '0' + m;
         }
         if (s < 10) {
-            s = `0${s}`;
+            s = '0' + s;
         }
-        return `${m}:${s}`;
+        return m + ':' + s;
     }
 
     function getListLi(index) {
@@ -154,18 +150,18 @@ $(function () {
     }
 
     function Provider(provider, current) {
-        const callbacks = new ProviderCallback();
-        let isStop;
+        var callbacks = new ProviderCallback();
+        var isStop;
         this.call = function (name, success, error) {
             if (!error) {
                 error = function () {}
             }
-            const data = current[name];
+            var data = current[name];
             if (data) {
                 success(data);
                 return;
             }
-            const callback = provider[name];
+            var callback = provider[name];
             if (callback === true) {
                 callbacks.set(name, success, error);
                 return;
@@ -181,7 +177,7 @@ $(function () {
         };
         this.load = function () {
             isStop = false;
-            const load = provider.load;
+            var load = provider.load;
             if (!load) {
                 return;
             }
@@ -189,10 +185,10 @@ $(function () {
         };
 
         function ProviderCallback() {
-            const callbacks = {};
-            const caches = {};
+            var callbacks = {};
+            var caches = {};
             this.success = function (name, data, cache) {
-                const callback = callbacks[name];
+                var callback = callbacks[name];
                 if (!callback) {
                     caches[name] = {
                         data: data,
@@ -203,7 +199,7 @@ $(function () {
                 callback.success(data, cache);
             };
             this.error = function (name) {
-                const callback = callbacks[name];
+                var callback = callbacks[name];
                 if (!callback) {
                     caches[name] = false;
                     return;
@@ -214,7 +210,7 @@ $(function () {
                 if (isStop) {
                     return;
                 }
-                const cache = caches[name];
+                var cache = caches[name];
                 if (cache) {
                     success(cache.data, cache.cache);
                     return;
@@ -230,11 +226,11 @@ $(function () {
 
     function getProvider(current) {
         // noinspection JSUnresolvedVariable
-        const providerName = current.provider || q.defaultProvider;
+        var providerName = current.provider || q.defaultProvider;
         if (typeof providerName === 'string') {
-            let provider = q.provider[providerName];
+            var provider = q.provider[providerName];
             if (!provider) {
-                console.warn(`没有找到相应的 Provider：${providerName}`);
+                console.warn('没有找到相应的 Provider：' + providerName);
                 provider = {};
             }
             provider = current.provider = new Provider(provider, current);
@@ -252,9 +248,9 @@ $(function () {
         this.offset = 0;
         this.has = false;
         this.add = function (time, text) {
-            const length = this.time.length;
-            for (let i = 0; i < length; ++i) {
-                const t = this.time[i];
+            var length = this.time.length;
+            for (var i = 0; i < length; ++i) {
+                var t = this.time[i];
                 if (t < time) {
                     continue;
                 }
@@ -272,9 +268,9 @@ $(function () {
             this.text[length] = text;
         };
         this.find = function (time) {
-            const length = this.time.length;
-            for (let i = 0; i < length; ++i) {
-                const t = this.time[i] + this.offset;
+            var length = this.time.length;
+            for (var i = 0; i < length; ++i) {
+                var t = this.time[i] + this.offset;
                 if (t < time) {
                     continue;
                 }
@@ -294,7 +290,7 @@ $(function () {
             if (index < 0) {
                 return;
             }
-            const $current = $($lyricsList[index]).addClass('QPlayer-lyrics-current');
+            var $current = $($lyricsList[index]).addClass('QPlayer-lyrics-current');
             $lyrics.stop(true).animate({
                 scrollTop: $current.offset().top - $lyrics.offset().top + $lyrics.scrollTop()
                     - ($lyrics.height() - $current.height()) / 2
@@ -307,35 +303,36 @@ $(function () {
             this.goto(this.index + 1);
         };
         this.show = function () {
-            const length = this.text.length;
+            var length = this.text.length;
             if (length === 0) {
                 return;
             }
-            let html = '';
-            for (let i = 0; i < length; ++i) {
-                html += `<p>${this.text[i]}</p>`;
+            var html = '';
+            for (var i = 0; i < length; ++i) {
+                html += '<p>' + this.text[i] + '</p>';
             }
             $lyrics.removeClass('QPlayer-lyrics-no');
             $lyrics.html(html);
             $lyricsList = $lyrics.children();
             this.goto(-1);
         };
-        const linePattern = /^/mg;
-        const timePattern = /\t*\[([0-6]?\d):([0-6]?\d)(?:\.(\d{1,3}))?]/g;
-        const textPattern = /.*/mg;
-        const offsetPattern = /^\[offset:\t*([+-]?\d+)]/mg;
+        var linePattern = /^/mg;
+        var timePattern = /\t*\[([0-6]?\d):([0-6]?\d)(?:\.(\d{1,3}))?]/g;
+        var textPattern = /.*/mg;
+        var offsetPattern = /^\[offset:\t*([+-]?\d+)]/mg;
         while ((linePattern.exec(lrc)) !== null) {
-            const lineIndex = linePattern.lastIndex;
-            let result;
+            var lineIndex = linePattern.lastIndex;
+            var result;
             offsetPattern.lastIndex = lineIndex;
             if ((result = offsetPattern.exec(lrc)) != null) {
                 linePattern.lastIndex = offsetPattern.lastIndex;
                 this.offset = parseFloat(result[1]);
                 continue;
             }
-            let index = timePattern.lastIndex = lineIndex;
-            const times = [];
+            var index = timePattern.lastIndex = lineIndex;
+            var times = [];
             function isTime() {
+                // noinspection JSReferencingMutableVariableFromClosure
                 return (result = timePattern.exec(lrc)) != null && result.index === index;
             }
             if (!isTime()) {
@@ -344,11 +341,11 @@ $(function () {
             }
             do {
                 linePattern.lastIndex = textPattern.lastIndex = timePattern.lastIndex;
-                let time = parseInt(result[1]) * 60000 + parseInt(result[2]) * 1000;
-                const f = result[3];
+                var time = parseInt(result[1]) * 60000 + parseInt(result[2]) * 1000;
+                var f = result[3];
                 if (f) {
-                    const length = f.length;
-                    time += parseInt(length < 3 ? f + '0'.repeat(3 - length) : f);
+                    var fLength = f.length;
+                    time += parseInt(fLength < 3 ? f + '0'.repeat(3 - fLength) : f);
                 }
                 times.push(time);
                 index = timePattern.lastIndex;
@@ -356,9 +353,9 @@ $(function () {
             if (times.length === 0) {
                 continue;
             }
-            const text = textPattern.exec(lrc)[0].trim();
-            const length = times.length;
-            for (let i = 0; i < length; ++i) {
+            var text = textPattern.exec(lrc)[0].trim();
+            var length = times.length;
+            for (var i = 0; i < length; ++i) {
                 this.add(times[i], text);
             }
         }
@@ -399,7 +396,7 @@ $(function () {
     }
 
     function isNeedMarquee() {
-        let width = 0;
+        var width = 0;
         // noinspection JSUnresolvedFunction
         $title.children().each(function () {
             width += $(this).width();
@@ -415,41 +412,41 @@ $(function () {
      */
     q.load = function(index) {
         isAllError = false;
-        let current = q.current;
+        var current = q.current;
         if (current) {
             getProvider(current).stop();
             isLoadPause = true;
             audio.pause();
         }
         initLoad();
-        const length = v.list.length;
+        var length = v.list.length;
         if (length === 0) {
             console.warn('list 为空！');
             return false;
         }
         if (!(length > index || index > 0)) {
-            console.warn(`超出 list，length=${length}，index=${index}`);
+            console.warn('超出 list，length=' + length + '，index=' + index);
             return false;
         }
         $list.children('.QPlayer-list-current').removeClass('QPlayer-list-current');
-        const $li = getListLi(index).addClass('QPlayer-list-current');
+        var $li = getListLi(index).addClass('QPlayer-list-current');
         if (!current) {
             $list.scrollTop($li.offset().top - $list.offset().top + 1);
         }
         current = v.list[index];
-        $title.html(`<strong>${current.name}</strong><span> - ${current.artist}</span>`);
+        $title.html('<strong>' + current.name + '</strong><span>' + current.artist + '</span>');
         if (isNeedMarquee()) {
             $title.marquee({
                 duration: 10000,
                 gap: 40,
                 delayBeforeStart: 1000,
                 duplicated: true,
-                startVisible: true,
+                startVisible: true
             }).marquee('pause');
         }
         q.index = index;
         q.current = current;
-        const provider = getProvider(current);
+        var provider = getProvider(current);
         provider.call('cover', function (url, cache) {
             if (isAllError || !url) {
                 return;
@@ -507,10 +504,10 @@ $(function () {
         }
 
         onPlay();
-        const current = q.current;
+        var current = q.current;
         function error() {
-            const list = v.list;
-            const _index = list[index] === current ? index : list.indexOf(current);
+            var list = v.list;
+            var _index = list[index] === current ? index : list.indexOf(current);
             if (_index === -1) {
                 console.warn('未找到索引');
                 return;
@@ -543,7 +540,7 @@ $(function () {
     }
 
     q.play = function (index, isPrevious) {
-        const bool = play(index, isPrevious);
+        var bool = play(index, isPrevious);
         if (bool) {
             return bool;
         }
@@ -588,7 +585,7 @@ $(function () {
         q.isShuffle = !v.isShuffle
     });
     $list.on('click', 'li:not(.QPlayer-list-current)', function () {
-        const index = $(this).index();
+        var index = $(this).index();
         if (v.isShuffle) {
             q.shuffle = new Shuffle(index);
         }
@@ -599,9 +596,9 @@ $(function () {
         .on('pause', onPause)
         .on('ended', q.next)
         .on('timeupdate', function () {
-            const time = audio.currentTime;
+            var time = audio.currentTime;
             $time.text(s2m(time));
-            const lyrics = q.current.lyrics;
+            var lyrics = q.current.lyrics;
             if (lyrics && lyrics.has) {
                 lyrics.next(time * 1000);
             }
@@ -611,7 +608,7 @@ $(function () {
         })
         .on('error', function () {
             console.log('error', arguments);
-            const index = v.list.indexOf(q.current);
+            var index = v.list.indexOf(q.current);
             if (index !== -1 && errorWithIndex(index)) {
                 return;
             }
@@ -627,9 +624,9 @@ $(function () {
     ;
 
     // 进度条操作
-    let isProgressClicked;
+    var isProgressClicked;
     function getXFromEvent(e) {
-        const type = e.type;
+        var type = e.type;
         switch (type) {
             case 'mousedown':
             case 'mouseup':
@@ -650,8 +647,8 @@ $(function () {
             return;
         }
         e.preventDefault();
-        const total = $progress.width();
-        const current = getProgressFromEvent(e);
+        var total = $progress.width();
+        var current = getProgressFromEvent(e);
         $progressCurrent.width(current < total ? current : total);
     }
     $progress.on('mousedown touchstart', function (e) {
@@ -664,20 +661,20 @@ $(function () {
                 return;
             }
             isProgressClicked = false;
-            const duration = audio.duration;
+            var duration = audio.duration;
             if (isNaN(duration)) {
                 $progressCurrent.width(0);
                 return;
             }
-            const total = $progress.width();
-            const current = getProgressFromEvent(e);
+            var total = $progress.width();
+            var current = getProgressFromEvent(e);
             if (current >= total) {
                 q.next();
                 return;
             }
-            const time = current > 0 ? duration * current / total: 0;
+            var time = current > 0 ? duration * current / total: 0;
             audio.currentTime = time;
-            const lyrics = q.current.lyrics;
+            var lyrics = q.current.lyrics;
             if (lyrics && lyrics.has) {
                 lyrics.goto(lyrics.find(time * 1000));
             }
@@ -692,7 +689,7 @@ $(function () {
     }
 
     function getBoolFromLocalStorage(name) {
-        const value = localStorage.getItem(getLocalStorageName(name));
+        var value = localStorage.getItem(getLocalStorageName(name));
         return !!(value && value !== 'false');
     }
 
@@ -705,20 +702,20 @@ $(function () {
     }
 
     function defineProperties(obj, properties) {
-        const keys = Object.keys(properties);
-        const length = keys.length;
-        for (let i = 0; i < length; ++i) {
-            const key = keys[i];
-            v[key] = obj[key];
+        var keys = Object.keys(properties);
+        var length = keys.length;
+        for (var i1 = 0; i1 < length; ++i1) {
+            var key1 = keys[i1];
+            v[key1] = obj[key1];
         }
         Object.defineProperties(obj, properties);
-        for (let i = 0; i < length; ++i) {
-            const key = keys[i];
-            if (properties[key].type === 'bool' && hasLocalStorageName(key)) {
-                obj[key] = getBoolFromLocalStorage(key);
+        for (var i2 = 0; i2 < length; ++i2) {
+            var key2 = keys[i2];
+            if (properties[key2].type === 'bool' && hasLocalStorageName(key2)) {
+                obj[key2] = getBoolFromLocalStorage(key2);
                 continue;
             }
-            obj[key] = v[key] || properties[key].default;
+            obj[key2] = v[key2] || properties[key2].default;
         }
     }
 
@@ -732,7 +729,7 @@ $(function () {
                 setBoolFromLocalStorage('isShuffle', value);
                 if (value) {
                     $mode.addClass('QPlayer-shuffle');
-                    const index = q.index;
+                    var index = q.index;
                     q.shuffle = new Shuffle(index === -1 ? undefined : index);
                 } else {
                     $mode.removeClass('QPlayer-shuffle');
@@ -771,20 +768,19 @@ $(function () {
                 if (value.length === 0) {
                     return;
                 }
-                const length = value.length;
-                let html = '';
-                for (let i = 0; i < length; ++i) {
-                    const item = value[i];
-                    let artist = item.artist;
+                var length = value.length;
+                var html = '';
+                for (var i = 0; i < length; ++i) {
+                    var item = value[i];
+                    var artist = item.artist;
                     if (Array.isArray(artist)) {
                         item.artist = artist = artist.join('/');
                     }
-                    html += `<li><strong>${item.name}</strong><span>${artist}</span></li>`;
+                    html += '<li><strong>' + item.name + '</strong><span>' + artist + '</span></li>';
                 }
                 $list.html(html);
                 $listLi = $list.children();
                 if (q.index > -1 && q.current) {
-                    const length = value.length;
                     if (length > q.index && value[q.index] === q.current) {
                         return;
                     }

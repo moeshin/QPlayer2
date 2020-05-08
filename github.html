@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>QPlayer by Github</title>
+    <link rel="stylesheet" href="QPlayer.css">
+    <script src="https://cdnjs.loli.net/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
+    <script src="https://cdnjs.loli.net/ajax/libs/jQuery.Marquee/1.5.0/jquery.marquee.min.js"></script>
+    <script src="QPlayer.js"></script>
+    <script>
+        window.q = window.QPlayer;
+        $(function () {
+            $('#QPlayer').addClass('QPlayer-show');
+            $('#QPlayer-more').addClass('QPlayer-list-show QPlayer-lyrics-show');
+            $('#js').val($('#js-code').text());
+        });
+        function execute() {
+            eval($('#js').val());
+        }
+    </script>
+    <style>
+        body {
+            background: darkgray;
+        }
+    </style>
+</head>
+<body>
+
+<script id="js-code">
+$.extend(true, window.QPlayer, {
+    defaultProvider: 'github',
+    provider: {
+        github: {
+            load: function (current, callbacks) {
+                var prefix = 'https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/' + current.name;
+                if (!current.audio) {
+                    callbacks.success('audio', prefix + '.mp3', true);
+                }
+                if (!current.cover) {
+                    callbacks.success('cover', prefix + '.jpg', true);
+                }
+                if (current.hasLyrics && !current.lyrics) {
+                    $.ajax({
+                        url: prefix + '.lrc',
+                        success: function (lrc) {
+                            callbacks.success('lyrics', lrc);
+                        }
+                    });
+                }
+            },
+            audio: true,
+            cover: true,
+            lyrics: true
+        }
+    }
+});
+window.QPlayer.list = [{
+    name: '且听风吟',
+    artist: 'V.A.'
+}, {
+    name: '白色',
+    artist: '灰澈'
+}, {
+    name: '渚 Warm Piano Arrange',
+    artist: 'Key Sounds Label'
+}, {
+    name: '小さなてのひら',
+    artist: '水月陵'
+}, {
+    name: 'Nightglow',
+    artist: '蔡健雅',
+    hasLyrics: true
+}, {
+    name: 'やわらかな光',
+    artist: 'やまだ豊'
+}, {
+    name: 'Saya\'s Song',
+    artist: 'Lia',
+    hasLyrics: true
+}, {
+    name: '一番の宝物 (Original Version)',
+    artist: 'karuta',
+    hasLyrics: true
+}, {
+    name: '僕が死のうと思ったのは',
+    artist: '中島美嘉',
+    hasLyrics: true
+}, {
+    name: '跟太阳系说再见',
+    artist: '祝乾亮'
+}, {
+    name: 'I Love Study 我爱学习（Off Vocal）',
+    artist: '秋风MusiX'
+}, {
+    name: 'Blessing 世界版',
+    artist: ['茶理理', 'V.A.'],
+    hasLyrics: true
+}];
+</script>
+
+<label>
+    JS Code: <br>
+    <textarea id="js" style="width: 100%; height: 320px; max-width: 100%; margin-top: 8px;"></textarea>
+</label>
+<p><button style="float: right; font-size: 18px;" onclick="execute()">execute</button></p>
+
+</body>
+</html>

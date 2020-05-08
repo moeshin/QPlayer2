@@ -8,63 +8,16 @@
     <script src="https://cdnjs.loli.net/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
     <script src="https://cdnjs.loli.net/ajax/libs/jQuery.Marquee/1.5.0/jquery.marquee.min.js"></script>
     <script src="QPlayer.js"></script>
-    <script src="provider/netease.js"></script>
     <script>
-        window.q = QPlayer;
-        QPlayer.list = [{
-            id: 28949746,
-            name: '且听风吟',
-            artist: '群星'
-        }, {
-            id: 494992638,
-            name: '白色',
-            artist: '灰澈'
-        }, {
-            id: 760979,
-            name: '渚 Warm Piano Arrange',
-            artist: 'Key Sounds Label'
-        }, {
-            id: 22706975,
-            name: '小さなてのひら',
-            artist: '水月陵'
-        }, {
-            id: 1333199831,
-            name: 'Nightglow',
-            artist: '蔡健雅'
-        }, {
-            id: 28287132,
-            name: 'やわらかな光',
-            artist: 'やまだ豊'
-        }, {
-            id: 28547662,
-            name: 'Saya\'s Song',
-            artist: 'Lia'
-        }, {
-            id: 471987,
-            name: '一番の宝物 (Original Version)',
-            artist: 'karuta'
-        }, {
-            id: 26830207,
-            name: '僕が死のうと思ったのは',
-            artist: '中島美嘉'
-        }, {
-            id: 1321297488,
-            name: '跟太阳系说再见',
-            artist: '祝乾亮'
-        }, {
-            id: 470638027,
-            name: 'I Love Study 我爱学习（Off Vocal）',
-            artist: '秋风MusiX'
-        }, {
-            id: 31234244,
-            name: 'Blessing 世界版',
-            artist: ['茶理理', 'V.A.']
-        }];
-        QPlayer.isShuffle = true;
+        window.q = window.QPlayer;
         $(function () {
             $('#QPlayer').addClass('QPlayer-show');
             $('#QPlayer-more').addClass('QPlayer-list-show QPlayer-lyrics-show');
+            $('#js').val($('#js-code').text());
         });
+        function execute() {
+            eval($('#js').val());
+        }
     </script>
     <style>
         body {
@@ -74,51 +27,95 @@
 </head>
 <body>
 
-<div id="QPlayer">
-    <div id="QPlayer-body">
-        <div id="QPlayer-panel">
-            <div id="QPlayer-cover">
-                <svg id="QPlayer-cover-default" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="32" style="fill:#222"/><circle cx="32" cy="32" r="16"/><circle cx="32" cy="32" r="12" style="fill:#e12"/><circle cx="32" cy="32" r="1.2" style="fill:#fff"/></svg>
-                <img id="QPlayer-cover-img" src="" alt="cover">
-            </div>
-            <div id="QPlayer-control">
-                <div id="QPlayer-title"><strong id="QPlayer-name"></strong> - <span id="QPlayer-artist"></span></div>
-                <div id="QPlayer-progress">
-                    <div id="QPlayer-progress-current" style="width: 0;"></div>
-                </div>
-                <div id="QPlayer-control-bar">
-                    <div id="QPlayer-time">00:00</div>
-                    <div id="QPlayer-control-play">
-                        <svg id="QPlayer-btn-previous" xmlns="http://www.w3.org/2000/svg" viewBox="6 6 12 12"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-                        <svg id="QPlayer-btn-next" xmlns="http://www.w3.org/2000/svg" viewBox="6 6 12 12"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-                        <div id="QPlayer-btn-play">
-                            <svg id="QPlayer-play" xmlns="http://www.w3.org/2000/svg" viewBox="16 10 22 28"><path d="M16 10v28l22-14z"/></svg>
-                            <svg id="QPlayer-pause" xmlns="http://www.w3.org/2000/svg" viewBox="12 10 24 28"><path d="M12 38h8V10h-8v28zm16-28v28h8V10h-8z"/></svg>
-                        </div>
-                    </div>
-                    <div id="QPlayer-control-more">
-                        <div id="QPlayer-btn-mode">
-                            <svg id="QPlayer-btn-repeat" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
-                            <svg id="QPlayer-btn-shuffle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
-                        </div>
-                        <svg id="QPlayer-btn-list" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18"><path d="M7 10h9V8H7v2zm0-7v2h9V3H7zm0 12h9v-2H7v2zm-4-5h2V8H3v2zm0-7v2h2V3H3zm0 12h2v-2H3v2z"/></svg>
-                        <svg id="QPlayer-btn-lyrics" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18"><path d="M4 14v2h10v-2H4zm0-8v2h10V6H4zm-2 6h14v-2H2v2zM2 2v2h14V2H2z"/></svg>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="QPlayer-switch"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>
-    </div>
-    <div id="QPlayer-more">
-        <ol id="QPlayer-list">
-            <li>没有歌曲</li>
-        </ol>
-        <div id="QPlayer-lyrics" class="QPlayer-lyrics-no">
-            <p>暂无歌词，请欣赏。</p>
-        </div>
-    </div>
-    <audio id="QPlayer-audio"></audio>
-</div>
+<script id="js-code">
+window.QPlayer.list = [
+    {
+        "name": "且听风吟",
+        "artist": "V.A.",
+        "audio": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/且听风吟.mp3"
+    },
+    {
+        "name": "白色",
+        "artist": "灰澈",
+        "audio": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/白色.mp3",
+        "cover": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/白色.jpg"
+    },
+    {
+        "name": "渚 Warm Piano Arrange",
+        "artist": "Key Sounds Label",
+        "audio": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/渚 Warm Piano Arrange.mp3",
+        "cover": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/渚 Warm Piano Arrange.jpg"
+    },
+    {
+        "name": "小さなてのひら",
+        "artist": "水月陵",
+        "audio": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/小さなてのひら.mp3",
+        "cover": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/小さなてのひら.jpg"
+    },
+    {
+        "name": "Nightglow",
+        "artist": "蔡健雅",
+        "audio": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/Nightglow.mp3",
+        "cover": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/Nightglow.jpg",
+        "lrc": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/Nightglow.lrc"
+    },
+    {
+        "name": "やわらかな光",
+        "artist": "やまだ豊",
+        "audio": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/やわらかな光.mp3",
+        "cover": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/やわらかな光.jpg"
+    },
+    {
+        "name": "Saya's Song",
+        "artist": "Lia",
+        "audio": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/Saya's Song.mp3",
+        "cover": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/Saya's Song.jpg",
+        "lrc": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/Saya's Song.lrc"
+    },
+    {
+        "name": "一番の宝物 (Original Version)",
+        "artist": "karuta",
+        "audio": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/一番の宝物 (Original Version).mp3",
+        "cover": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/一番の宝物 (Original Version).jpg",
+        "lrc": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/一番の宝物 (Original Version).lrc"
+    },
+    {
+        "name": "僕が死のうと思ったのは",
+        "artist": "中島美嘉",
+        "audio": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/僕が死のうと思ったのは.mp3",
+        "cover": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/僕が死のうと思ったのは.jpg",
+        "lrc": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/僕が死のうと思ったのは.lrc"
+    },
+    {
+        "name": "跟太阳系说再见",
+        "artist": "祝乾亮",
+        "audio": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/跟太阳系说再见.mp3",
+        "cover": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/跟太阳系说再见.jpg"
+    },
+    {
+        "name": "I Love Study 我爱学习（Off Vocal）",
+        "artist": "秋风MusiX",
+        "audio": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/I Love Study 我爱学习（Off Vocal）.mp3",
+        "cover": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/I Love Study 我爱学习（Off Vocal）.jpg"
+    },
+    {
+        "name": "Blessing 世界版",
+        "artist": [
+            "茶理理",
+            "V.A."
+        ],
+        "audio": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/Blessing 世界版.mp3",
+        "cover": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/Blessing 世界版.jpg",
+        "lrc": "https://raw.githubusercontent.com/moeshin/QPlayer-resources/master/Blessing 世界版.lrc"
+    }
+];
+</script>
+
+<label>
+    JS Code: <br>
+    <textarea id="js" style="width: 100%; height: 320px; max-width: 100%; margin-top: 8px;"></textarea>
+</label>
+<p><button style="float: right; font-size: 18px;" onclick="execute()">execute</button></p>
 
 </body>
 </html>

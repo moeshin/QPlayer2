@@ -119,5 +119,24 @@ If the list item has the `lrc` property set and it is `url`, will use ajax load 
 
 And you set `QPlayer.provider.default.dataType`, default is `*`, see [jQuery.ajax()](https://api.jquery.com/jQuery.ajax/) for details.
 
+### QPlayer.setColor
+
+```js
+/**
+* @param {Object|String} options A color or options.
+*/
+function setColor(options) {}
+```
+
+| Options
+| -----
+| all
+| switch
+| progress
+| list
+| lyrics
+
+You can set `false` to filter.
+
 
 [0]: https://de.wikipedia.org/wiki/LRC_(Dateiformat

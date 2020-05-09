@@ -580,6 +580,48 @@ $(function () {
         return q.play(getPreviousIndex(), true);
     };
 
+    /**
+     * @param {Object|String} options
+     */
+    q.setColor = function(options) {
+        var jq = $('#QPlayer-theme');
+        if (!jq.length) {
+            jq = $('<style id="QPlayer-theme"></style>');
+            $q.append(jq);
+        }
+        if (!all) {
+            jq.text('');
+            return;
+        }
+        // noinspection JSDeprecatedSymbols
+        var all = typeof options === 'string' ? options : options.all;
+        var color;
+        var style = '';
+        function getColor(name) {
+            color = options[name];
+            if (color === undefined) {
+                color = all;
+            }
+        }
+        getColor('switch');
+        if (color) {
+            style += '#QPlayer-switch{background:' + color + ';}';
+        }
+        getColor('progress');
+        if (color) {
+            style += '#QPlayer-progress-current{background:' + color + ';}';
+        }
+        getColor('list');
+        if (color) {
+            style += '#QPlayer-list li:hover, #QPlayer-list li.QPlayer-list-current{border-left-color:' + color + ';}';
+        }
+        getColor('lyrics');
+        if (color) {
+            style += '#QPlayer-lyrics.QPlayer-lyrics-no p,#QPlayer-lyrics p.QPlayer-lyrics-current{color:' + color + ';}';
+        }
+        jq.text(style);
+    };
+
     $('#QPlayer-switch').click(function () {
         $q.toggleClass('QPlayer-show');
     });

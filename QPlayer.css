@@ -60,6 +60,9 @@
 #QPlayer-cover.QPlayer-cover-no #QPlayer-cover-default {
     display: unset;
 }
+#QPlayer-cover img {
+    width: 64px;
+}
 @keyframes rotate {
     from {
         transform: rotate(0deg);

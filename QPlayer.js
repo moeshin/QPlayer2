@@ -39,9 +39,10 @@ $(function () {
             if (!url) {
                 return;
             }
+            var dataType = this.dataType;
             $.ajax({
                 url: url,
-                dataType: this.dataType,
+                dataType: dataType,
                 success: function (lrc) {
                     if (!lrc) {
                         return;
@@ -796,6 +797,7 @@ $(function () {
                     }
                     html += '<li><strong>' + item.name + '</strong><span>' + artist + '</span></li>';
                 }
+                q.pause();
                 $list.html(html);
                 $listLi = $list.children();
                 if (length === 0) {

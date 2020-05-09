@@ -29,6 +29,7 @@ $(function () {
 
     var $lyricsList, $listLi, isLoadPause, isPrevisionPlay, errorStartIndex, isAllError;
 
+    q.version = '2.0.0';
     q.audio = audio;
     q.defaultProvider = q.defaultProvider || 'default';
     q.provider = q.provider || {};

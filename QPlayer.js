@@ -571,7 +571,21 @@ window.QPlayer.init = function () {
             }
             audio.src = url;
             audio.load();
-            audio.play();
+            function catchError(e) {
+                if (e.name === 'AbortError') {
+                    return;
+                }
+                throw e;
+            }
+            try {
+                var promise = audio.play();
+                // noinspection JSUnresolvedVariable
+                if (typeof Promise === 'function' && promise instanceof Promise) {
+                    promise.catch(catchError);
+                }
+            } catch (e) {
+                catchError(e);
+            }
         }, error);
         return 3;
     }

@@ -1,6 +1,12 @@
-# QPLayer
+# QPLayer2
+
+[![jsDelivr](https://img.shields.io/jsdelivr/gh/hm/moeshin/QPlayer2?style=flat-square)](https://www.jsdelivr.com/package/gh/moeshin/QPlayer2)
+[![jsDelivr](https://img.shields.io/github/v/release/moeshin/QPlayer2?style=flat-square)](https://github.com/moeshin/QPlayer2/releases/latest)
+[![GitHub](https://img.shields.io/github/license/moeshin/QPlayer2?style=flat-square)](https://github.com/moeshin/QPlayer2/blob/master/LICENSE)
 
 A simple and compact HTML5 bottom hover music player.
+
+Demos: https://moeshin.github.io/QPlayer2/demos
 
 ### List Item
 
@@ -10,7 +16,7 @@ A simple and compact HTML5 bottom hover music player.
 | artist    | Array &#124; String        |
 | audio     | Url                        |
 | cover     | Url                        |
-| lyrics    | [LRC][0] &#124; Lyrics     |
+| lyrics    | [LRC][0]                   |
 | provider  | [Provider Name](#Provider) |
 
 ### Provider
@@ -128,15 +134,15 @@ And you set `QPlayer.provider.default.dataType`, default is `*`, see [jQuery.aja
 function setColor(options) {}
 ```
 
-| Options
-| -----
-| all
-| switch
-| progress
-| list
-| lyrics
+#### Options
+ 
+* all
+* switch
+* progress
+* list
+* lyrics
 
-You can set `false` to filter.
+If `all` is set, you can set options other to `false` to filter.
 
 ### QPlayer.init
 

@@ -57,7 +57,7 @@ function callback(current, callbacks) {}
 #### Example 1: General callback
 
 ```js
-QPlayer = $.extend(true, QPlayer, {
+window.QPlayer = $.extend(true, window.QPlayer, {
     provider: {
         example: {
             lyrics: function(current, success) {
@@ -80,7 +80,7 @@ QPlayer = $.extend(true, QPlayer, {
         provider: 'example'
     }]
 });
-QPlayer.list = [{
+window.QPlayer.list = [{
     name: 'Hello World',
     lrc: 'Hello World.lrc',
     provider: 'example'
@@ -90,7 +90,7 @@ QPlayer.list = [{
 #### Example 2: Loading callback
 
 ```js
-QPlayer = $.extend(true, QPlayer, {
+window.QPlayer = $.extend(true, window.QPlayer, {
     provider: {
         example: {
             load: function(current, callbacks) {
@@ -109,7 +109,7 @@ QPlayer = $.extend(true, QPlayer, {
         }
     }
 });
-QPlayer.list = [{
+window.QPlayer.list = [{
     name: 'Hello World',
     provider: 'example'
 }];

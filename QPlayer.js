@@ -429,6 +429,15 @@ $(function () {
         return width > $title.width();
     }
 
+    function preloadCover(url) {
+        var image = new Image();
+        image.onload = function () {
+            $cover.css('background-image', 'url(' + url + ')');
+            $cover.removeClass('QPlayer-cover-no');
+        };
+        image.src = url;
+    }
+
     /**
      * 加载
      *
@@ -476,8 +485,7 @@ $(function () {
             if (isAllError || !url) {
                 return;
             }
-            $cover.css('background-image', 'url(' + url + ')');
-            $cover.removeClass('QPlayer-cover-no');
+            preloadCover(url);
             if (cache) {
                current.cover = url;
             }

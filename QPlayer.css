@@ -43,6 +43,10 @@
     float: left;
     border-radius: 50%;
     overflow: hidden;
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
 }
 #QPlayer-cover.QPlayer-cover-rotate {
     animation: rotate 10s linear infinite paused;
@@ -51,17 +55,14 @@
     animation-play-state: running;
 }
 #QPlayer-cover.QPlayer-cover-no {
+    background-image: none !important;
     animation: none;
 }
-#QPlayer-cover-default,
-#QPlayer-cover.QPlayer-cover-no #QPlayer-cover-img  {
+#QPlayer-cover-default {
     display: none;
 }
 #QPlayer-cover.QPlayer-cover-no #QPlayer-cover-default {
     display: unset;
-}
-#QPlayer-cover img {
-    width: 64px;
 }
 @keyframes rotate {
     from {

@@ -138,5 +138,11 @@ function setColor(options) {}
 
 You can set `false` to filter.
 
+### QPlayer.init
+
+It will be auto called with jQuery ready.
+
+You can also call it after [pjax](https://github.com/defunkt/jquery-pjax).
+
 
 [0]: https://de.wikipedia.org/wiki/LRC_(Dateiformat

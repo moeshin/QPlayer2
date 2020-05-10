@@ -27,10 +27,11 @@ window.QPlayer.init = function () {
     ;
 
     var
-        audio = $audio[0]
+        audio = $audio[0],
+        coverTimeout = 200
     ;
 
-    var $lyricsList, $listLi, isLoadPause, isPrevisionPlay, errorStartIndex, isAllError;
+    var $lyricsList, $listLi, isLoadPause, isPrevisionPlay, errorStartIndex, isAllError, setCoverTime;
 
     q.version = '2.0.1';
     q.audio = audio;
@@ -401,9 +402,13 @@ window.QPlayer.init = function () {
     }
 
     function initCover() {
-        $cover.addClass('QPlayer-cover-no');
-        $cover.css('background-image', 'none');
-        $cover.offset();
+        setTimeout(function () {
+            if (setCoverTime >= new Date().getTime() - coverTimeout) {
+                return;
+            }
+            $cover.css('background-image', '');
+            $cover.addClass('QPlayer-cover-no');
+        }, coverTimeout);
     }
 
     function initLoad() {
@@ -436,7 +441,8 @@ window.QPlayer.init = function () {
     function preloadCover(url) {
         var image = new Image();
         image.onload = function () {
-            $cover.css('background-image', 'url(' + url + ')');
+            setCoverTime = new Date().getTime();
+            $cover.css('background-image', 'url("' + url + '")');
             $cover.removeClass('QPlayer-cover-no');
         };
         image.src = url;
@@ -673,8 +679,6 @@ window.QPlayer.init = function () {
     $('#QPlayer-btn-previous').click(q.previous);
     $cover.click(function () {
         q.isRotate = !v.isRotate;
-    }).on('error', function () {
-        initCover();
     });
     $mode.click(function () {
         q.isShuffle = !v.isShuffle

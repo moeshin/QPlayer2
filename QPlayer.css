@@ -55,7 +55,6 @@
     animation-play-state: running;
 }
 #QPlayer-cover.QPlayer-cover-no {
-    background-image: none !important;
     animation: none;
 }
 #QPlayer-cover-default {

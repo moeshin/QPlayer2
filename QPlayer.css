@@ -214,16 +214,16 @@
 }
 #QPlayer-list {
     float: left;
-    height: 1px;
+    max-height: 1px;
     width: 264px;
     padding: 0;
     margin: 0;
     border-top: 1px solid #DEDEDE;
     overflow: auto;
-    transition: height .8s;
+    transition: max-height .8s;
 }
 #QPlayer-more.QPlayer-list-show #QPlayer-list {
-    height: 360px;
+    max-height: 360px;
 }
 #QPlayer-list li {
     padding: 2px 10px;

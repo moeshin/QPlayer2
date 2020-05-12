@@ -429,6 +429,12 @@ window.QPlayer.init = function () {
         errorStartIndex = -1;
     }
 
+    function initNoSongs() {
+        init();
+        $listLi = null;
+        $list.html('<li class="QPlayer-list-current">没有歌曲</li>');
+    }
+
     function isNeedMarquee() {
         var width = 0;
         // noinspection JSUnresolvedFunction
@@ -780,8 +786,7 @@ window.QPlayer.init = function () {
         })
         .on('mousemove touchmove', moveProgress);
 
-    init();
-    $list.html('<li class="QPlayer-list-current">没有歌曲</li>');
+    initNoSongs();
 
     function getLocalStorageName(name) {
         return 'QPlayer-' + name;
@@ -865,6 +870,10 @@ window.QPlayer.init = function () {
                 }
                 v.list = value;
                 var length = value.length;
+                if (length === 0) {
+                    initNoSongs();
+                    return;
+                }
                 var html = '';
                 for (var i = 0; i < length; ++i) {
                     var item = value[i];
@@ -877,10 +886,6 @@ window.QPlayer.init = function () {
                 q.pause();
                 $list.html(html);
                 $listLi = $list.children();
-                if (length === 0) {
-                    init();
-                    return;
-                }
                 if (q.index > -1 && q.current && length > q.index && value[q.index] === q.current) { // 已加载保持不变
                     return;
                 }

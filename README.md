@@ -151,4 +151,17 @@ It will be auto called with jQuery ready.
 You can also call it after [pjax](https://github.com/defunkt/jquery-pjax).
 
 
+### Other Methods
+
+* `load(index)`
+* `play(index, isPrevious)`
+* `next()`
+* `prevision()`
+
+### Other Properties
+
+* `isRotate`
+* `isShuffle`
+
+
 [0]: https://de.wikipedia.org/wiki/LRC_(Dateiformat

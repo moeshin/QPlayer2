@@ -632,12 +632,12 @@ window.QPlayer.init = function () {
             jq = $('<style id="QPlayer-theme"></style>');
             $q.append(jq);
         }
+        // noinspection JSDeprecatedSymbols
+        var all = typeof options === 'string' ? options : options.all;
         if (!all) {
             jq.text('');
             return;
         }
-        // noinspection JSDeprecatedSymbols
-        var all = typeof options === 'string' ? options : options.all;
         var color;
         var style = '';
         function getColor(name) {

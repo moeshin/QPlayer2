@@ -28,7 +28,7 @@ window.QPlayer.init = function () {
 
     var
         audio = $audio[0],
-        coverTimeout = 200
+        coverTimeout = 500
     ;
 
     var $lyricsList, $listLi, isLoadPause, isPrevisionPlay, errorStartIndex, isAllError, setCoverTime;
@@ -458,6 +458,24 @@ window.QPlayer.init = function () {
         $list.scrollTop($list.scrollTop() - $list.offset().top + $li.offset().top + 1);
     }
 
+    function audioPlay() {
+        function catchError(e) {
+            if (e.name === 'AbortError') {
+                return;
+            }
+            console.error([e]);
+        }
+        try {
+            var promise = audio.play();
+            // noinspection JSUnresolvedVariable
+            if (typeof Promise === 'function' && promise instanceof Promise) {
+                promise.catch(catchError);
+            }
+        } catch (e) {
+            catchError(e);
+        }
+    }
+
     /**
      * 加载
      *
@@ -548,7 +566,7 @@ window.QPlayer.init = function () {
             index = q.index;
             if (audio.readyState !== 0) {
                 onPlay();
-                audio.play();
+                audioPlay();
                 return 2;
             }
         }
@@ -587,21 +605,7 @@ window.QPlayer.init = function () {
             }
             audio.src = url;
             audio.load();
-            function catchError(e) {
-                if (e.name === 'AbortError') {
-                    return;
-                }
-                throw e;
-            }
-            try {
-                var promise = audio.play();
-                // noinspection JSUnresolvedVariable
-                if (typeof Promise === 'function' && promise instanceof Promise) {
-                    promise.catch(catchError);
-                }
-            } catch (e) {
-                catchError(e);
-            }
+            audioPlay();
         }, error);
         return 3;
     }

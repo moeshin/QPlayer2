@@ -413,6 +413,7 @@ window.QPlayer.init = function () {
 
     function initLoad() {
         $lyrics.addClass('QPlayer-lyrics-no').html('<p>无歌词，请欣赏。</p>');
+        $title.html('<strong>没有歌曲</strong>');
         $lyricsList = null;
         $progressCurrent.width('0');
         audio.currentTime = 0;
@@ -424,7 +425,6 @@ window.QPlayer.init = function () {
         q.index= -1;
         q.current = null;
         initLoad();
-        $title.html('<strong>没有歌曲</strong>');
         isLoadPause = false;
         errorStartIndex = -1;
     }

@@ -10,14 +10,14 @@ Demos: https://moeshin.github.io/QPlayer2/demos
 
 ### List Item
 
-| Key       | Type                       |
-| --------- | -------------------------- |
-| name      | String                     |
-| artist    | Array &#124; String        |
-| audio     | Url                        |
-| cover     | Url                        |
-| lyrics    | [LRC][0]                   |
-| provider  | [Provider Name](#Provider) |
+| Key       | Type                       | Must |
+| --------- | -------------------------- | ---- |
+| name      | String                     | Yes  |
+| artist    | Array &#124; String        | No   |
+| audio     | URL                        | No   |
+| cover     | URL                        | No   |
+| lyrics    | [LRC][0]                   | No   |
+| provider  | [Provider Name](#Provider) | No   |
 
 ### Provider
 

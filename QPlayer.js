@@ -627,9 +627,14 @@ window.QPlayer.init = function () {
         return q.play(getNextIndex());
     };
 
-    q.previous = function previous() {
+    q.previous = function () {
         return q.play(getPreviousIndex(), true);
     };
+
+    q.reload = function () {
+        q.pause();
+        return q.load(q.index);
+    }
 
     /**
      * @param {Object|String} options

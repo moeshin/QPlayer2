@@ -318,7 +318,7 @@ window.QPlayer.init = function () {
             var $current = $($lyricsList[index]).addClass('QPlayer-lyrics-current');
             $lyrics.stop(true).animate({
                 scrollTop: $current.offset().top - $lyrics.offset().top + $lyrics.scrollTop()
-                    - ($lyrics.height() - $current.height()) / 2
+                    - (162 - $current.height()) / 2
             });
         };
         this.next = function (time) {
@@ -454,6 +454,10 @@ window.QPlayer.init = function () {
         image.src = url;
     }
 
+    function anchorSongList($li) {
+        $list.scrollTop($list.scrollTop() - $list.offset().top + $li.offset().top + 1);
+    }
+
     /**
      * 加载
      *
@@ -481,7 +485,7 @@ window.QPlayer.init = function () {
         $list.children('.QPlayer-list-current').removeClass('QPlayer-list-current');
         var $li = getListLi(index).addClass('QPlayer-list-current');
         if (!current) {
-            $list.scrollTop($li.offset().top - $list.offset().top + 1);
+            anchorSongList($li)
         }
         current = v.list[index];
         $title.html('<strong>' + current.name + '</strong><span> - ' + current.artist + '</span>');
@@ -669,7 +673,16 @@ window.QPlayer.init = function () {
         $q.toggleClass('QPlayer-show');
     });
     $('#QPlayer-btn-list').click(function () {
-        $more.toggleClass('QPlayer-list-show');
+        var name = 'QPlayer-list-show';
+        if ($more.hasClass(name)) {
+            $more.removeClass(name);
+        } else {
+            var index = q.index;
+            if (index !== -1) {
+                anchorSongList(getListLi(index))
+            }
+            $more.addClass(name);
+        }
     });
     $('#QPlayer-btn-lyrics').click(function () {
         $more.toggleClass('QPlayer-lyrics-show');

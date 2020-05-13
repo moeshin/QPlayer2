@@ -476,6 +476,10 @@ window.QPlayer.init = function () {
         }
     }
 
+    function getArtist(artist) {
+        return Array.isArray(artist) ? artist.join(' / ') : artist;
+    }
+
     /**
      * 加载
      *
@@ -506,7 +510,12 @@ window.QPlayer.init = function () {
             anchorSongList($li)
         }
         current = v.list[index];
-        $title.html('<strong>' + current.name + '</strong><span> - ' + current.artist + '</span>');
+        var title = '<strong>' + current.name + '</strong>';
+        var artist = getArtist(current.artist);
+        if (artist) {
+            title += '<span> - ' + artist + '</span>';
+        }
+        $title.html(title);
         if (isNeedMarquee()) {
             $title.marquee({
                 duration: 10000,
@@ -899,11 +908,12 @@ window.QPlayer.init = function () {
                 var html = '';
                 for (var i = 0; i < length; ++i) {
                     var item = value[i];
-                    var artist = item.artist;
-                    if (Array.isArray(artist)) {
-                        item.artist = artist = artist.join('/');
+                    html += '<li><strong>' + item.name + '</strong>';
+                    var artist = getArtist(item.artist);
+                    if (artist) {
+                        html += '<span>' + artist + '</span>';
                     }
-                    html += '<li><strong>' + item.name + '</strong><span>' + artist + '</span></li>';
+                    html += '</li>';
                 }
                 q.pause();
                 $list.html(html);

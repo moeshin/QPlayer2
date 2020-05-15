@@ -163,5 +163,9 @@ You can also call it after [pjax](https://github.com/defunkt/jquery-pjax).
 * `isRotate`
 * `isShuffle`
 
+# Related Projects
+
+* [QPlayer2-Typecho](https://github.com/moeshin/QPlayer2-Typecho)
+
 
 [0]: https://de.wikipedia.org/wiki/LRC_(Dateiformat

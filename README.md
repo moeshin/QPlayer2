@@ -166,6 +166,7 @@ You can also call it after [pjax](https://github.com/defunkt/jquery-pjax).
 # Related Projects
 
 * [QPlayer2-Typecho](https://github.com/moeshin/QPlayer2-Typecho)
+* [QPlayer2-WordPress](https://github.com/moeshin/QPlayer2-WordPress)
 
 
 [0]: https://de.wikipedia.org/wiki/LRC_(Dateiformat

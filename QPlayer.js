@@ -33,7 +33,7 @@ window.QPlayer.init = function () {
 
     var $lyricsList, $listLi, isLoadPause, isPrevisionPlay, errorStartIndex, isAllError, setCoverTime;
 
-    q.version = '2.0.5';
+    q.version = '2.0.6';
     q.audio = audio;
     q.defaultProvider = q.defaultProvider || 'default';
     q.provider = q.provider || {};

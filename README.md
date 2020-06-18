@@ -8,6 +8,8 @@ A simple and compact HTML5 bottom hover music player.
 
 Demos: https://moeshin.github.io/QPlayer2/demos
 
+<!--more-->
+
 ### List Item
 
 | Key       | Type                       | Must |

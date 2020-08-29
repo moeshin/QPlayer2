@@ -65,7 +65,7 @@
                         item.cover = item.pic;
                         item.provider = 'default';
                         delete item.author;
-                        delete item.time;
+                        delete item.title;
                         delete item.url;
                         delete item.pic;
                     }

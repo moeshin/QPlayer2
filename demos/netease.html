@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Netease Cloud Music Parsing</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="../QPlayer.css">
+    <script src="./jquery.min.js"></script>
+    <script src="./jquery.marquee.min.js"></script>
+    <script src="../QPlayer.js"></script>
+    <script src="./script.js"></script>
+    <script>
+function get () {
+    $.ajax({
+        url: 'https://api.i-meto.com/meting/api',
+        data: {
+            server: 'netease',
+            type: $('[name=type]:checked').val(),
+            id: $('#id').val()
+        },
+        success: function (data) {
+            var length = data.length;
+            for (var i = 0; i <length; ++i) {
+                var item = data[i];
+                item.name = item.title;
+                item.artist = item.author;
+                item.audio = item.url;
+                item.cover = item.pic;
+                delete item.title;
+                delete item.author;
+                delete item.url;
+                delete item.pic;
+                var lrc = item.lrc;
+                delete item.lrc;
+                item.lrc = lrc;
+            }
+            $('#json').val(JSON.stringify(data, null, 4))
+        }
+    });
+}
+window.execute = function () {
+    QPlayer.list = JSON.parse($('#json').val());
+}
+    </script>
+</head>
+<body>
+<p>Type:
+    <label><input type="radio" name="type" value="playlist" checked>Playlist</label>
+    <label><input type="radio" name="type" value="song">Song</label>
+    <label><input type="radio" name="type" value="album">Album</label>
+    <label><input type="radio" name="type" value="artist">Artist</label>
+</p>
+<p><label>ID: <input id="id" type="text" value="3136952023"></label></p>
+<p><button onclick="get()">Get</button></p>
+<label>JSON:<textarea id="json"></textarea></label>
+<p class="right"><button onclick="execute()">Execute</button></p>
+</body>
+</html>

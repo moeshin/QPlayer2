@@ -28,11 +28,10 @@ window.QPlayer.init = function () {
 
     var
         audio = $audio[0],
-        coverTimeout = 500,
-        created = false
+        coverTimeout = 500
     ;
 
-    var $lyricsList, $listLi, isLoadPause, isPrevisionPlay, errorStartIndex, isAllError, setCoverTime;
+    var $lyricsList, $listLi, isLoadPause, isPrevisionPlay, errorStartIndex, isAllError, setCoverTime, loadedList;
 
     q.version = '2.0.7';
     q.audio = audio;
@@ -941,14 +940,14 @@ window.QPlayer.init = function () {
             },
             set: function (value) {
                 v.isAutoplay = value;
-                if (created && value) {
+                if (loadedList && value) {
                     q.play();
                 }
             }
         },
-        created: {
+        loadedList: {
             get: function () {
-                return created;
+                return loadedList;
             }
         },
         list: {
@@ -960,6 +959,7 @@ window.QPlayer.init = function () {
                     console.warn('list 应该是数组');
                     return;
                 }
+                loadedList = false;
                 v.list = value;
                 var length = value.length;
                 if (length === 0) {
@@ -979,21 +979,20 @@ window.QPlayer.init = function () {
                 q.pause();
                 $list.html(html);
                 $listLi = $list.children();
-                if (q.index > -1 && q.current && length > q.index && value[q.index] === q.current) { // 已加载保持不变
-                    return;
+                if (!(q.index > -1 && q.current && length > q.index && value[q.index] === q.current)) {
+                    // if not append song
+                    init();
+                    q.load(getNextIndex());
                 }
-                init();
-                // noinspection JSCheckFunctionSignatures
-                q.load(getNextIndex());
+                loadedList = true;
+                if (q.isAutoplay) {
+                    q.play();
+                }
             },
             type: 'list',
             default: []
         }
     });
-    created = true;
-    if (q.isAutoplay) {
-        q.play();
-    }
 };
 
 $(window.QPlayer.init);

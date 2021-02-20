@@ -598,7 +598,7 @@ window.QPlayer.init = function () {
             var promise = null;
             try {
                 promise = audio.play();
-                if (typeof Promise === 'function' && promise instanceof Promise) {
+                if (typeof Promise === 'function' && promise instanceof Promise) {
                     promise
                         .then(function () {
                             getListLi(getIndex()).removeClass('QPlayer-list-error');
@@ -608,7 +608,7 @@ window.QPlayer.init = function () {
             } catch (e) {
                 catchError(e);
             }
-            if (!error && !(typeof Promise === 'function' && promise instanceof Promise)) {
+            if (!error && !(typeof Promise === 'function' && promise instanceof Promise)) {
                 getListLi(getIndex()).removeClass('QPlayer-list-error');
             }
         }

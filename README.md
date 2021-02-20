@@ -170,6 +170,7 @@ You can also call it after [pjax](https://github.com/defunkt/jquery-pjax).
 
 * [QPlayer2-Typecho](https://github.com/moeshin/QPlayer2-Typecho)
 * [QPlayer2-WordPress](https://github.com/moeshin/QPlayer2-WordPress)
+* [QPlayer2-ZBlog](https://github.com/moeshin/QPlayer2-ZBlog)
 
 
-[0]: https://de.wikipedia.org/wiki/LRC_(Dateiformat
+[0]: https://de.wikipedia.org/wiki/LRC_(Dateiformat)

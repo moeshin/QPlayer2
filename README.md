@@ -164,6 +164,7 @@ You can also call it after [pjax](https://github.com/defunkt/jquery-pjax).
 
 * `isRotate`
 * `isShuffle`
+* `isAutoplay`
 
 # Related Projects
 

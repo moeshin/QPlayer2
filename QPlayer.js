@@ -28,7 +28,8 @@ window.QPlayer.init = function () {
 
     var
         audio = $audio[0],
-        coverTimeout = 500
+        coverTimeout = 500,
+        created = false
     ;
 
     var $lyricsList, $listLi, isLoadPause, isPrevisionPlay, errorStartIndex, isAllError, setCoverTime;
@@ -588,26 +589,37 @@ window.QPlayer.init = function () {
         }
         function audioPlay() {
             function catchError(e) {
-                if (e.name === 'AbortError') {
-                    return;
+                switch (e.name) {
+                    case 'AbortError':
+                        return;
+                    case 'NotAllowedError':
+                        onPause();
+                        if (!canAutoplay()) {
+                            bindEventOnce(document, 'mousedown keydown', function () {
+                                audioPlay();
+                            });
+                            return;
+                        }
+                        break;
+                    default:
+                        error = true;
                 }
-                error = true;
                 console.error([e]);
             }
             var error = false;
             var promise = null;
             try {
                 promise = audio.play();
-                // noinspection JSUnresolvedVariable
-                if (typeof Promise === 'function' && promise instanceof Promise) {
-                    promise
-                        .then(function () {
-                            getListLi(getIndex()).removeClass('QPlayer-list-error');
-                        })
-                        .catch(catchError);
-                }
             } catch (e) {
                 catchError(e);
+            }
+            // noinspection JSUnresolvedVariable
+            if (typeof Promise === 'function' && promise instanceof Promise) {
+                promise
+                    .then(function () {
+                        getListLi(getIndex()).removeClass('QPlayer-list-error');
+                    })
+                    .catch(catchError);
             }
             // noinspection JSUnresolvedVariable
             if (!error && !(typeof Promise === 'function' && promise instanceof Promise)) {
@@ -630,6 +642,26 @@ window.QPlayer.init = function () {
             audioPlay();
         }, error);
         return 3;
+    }
+
+    function bindEventOnce(selector, types, fn) {
+        var jq = $(selector);
+        var listener = function () {
+            fn(...arguments);
+            jq.off(types, listener);
+        }
+        jq.on(types, listener);
+    }
+
+    function canAutoplay() {
+        if (typeof AudioContext !== 'function') {
+            return true;
+        }
+        var context = new AudioContext();
+        var r = context.state === 'running';
+        // noinspection JSIgnoredPromiseFromCall
+        context.close();
+        return r;
     }
 
     q.play = function (index, isPrevious) {
@@ -903,6 +935,22 @@ window.QPlayer.init = function () {
             type: 'bool',
             default: true
         },
+        isAutoplay: {
+            get: function () {
+                return v.isAutoplay;
+            },
+            set: function (value) {
+                v.isAutoplay = value;
+                if (created && value) {
+                    q.play();
+                }
+            }
+        },
+        created: {
+            get: function () {
+                return created;
+            }
+        },
         list: {
             get: function () {
                 return v.list;
@@ -942,7 +990,10 @@ window.QPlayer.init = function () {
             default: []
         }
     });
+    created = true;
+    if (q.isAutoplay) {
+        q.play();
+    }
 };
 
 $(window.QPlayer.init);
-

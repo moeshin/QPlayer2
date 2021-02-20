@@ -598,6 +598,7 @@ window.QPlayer.init = function () {
             var promise = null;
             try {
                 promise = audio.play();
+                // noinspection JSUnresolvedVariable
                 if (typeof Promise === 'function' && promise instanceof Promise) {
                     promise
                         .then(function () {
@@ -608,6 +609,7 @@ window.QPlayer.init = function () {
             } catch (e) {
                 catchError(e);
             }
+            // noinspection JSUnresolvedVariable
             if (!error && !(typeof Promise === 'function' && promise instanceof Promise)) {
                 getListLi(getIndex()).removeClass('QPlayer-list-error');
             }

@@ -60,9 +60,7 @@ if (!isset($_POST['type']) || !isset($_POST['id'])
     <title>Netease Cloud Music Parsing</title>
     <link rel="stylesheet" href="./style.css">
     <link rel="stylesheet" href="../QPlayer.css">
-    <script src="./jquery.min.js"></script>
-    <script src="./jquery.marquee.min.js"></script>
-    <script src="../QPlayer.js"></script>
+    <script src="../dist/QPlayer.js"></script>
     <script src="./script.js"></script>
     <script>
 window.execute = function () {

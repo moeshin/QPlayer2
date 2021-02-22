@@ -1,7 +1,9 @@
 var $ = require('jquery');
 // noinspection JSValidateTypes
-require('jquery.simplemarquee')($);
+require('jquery.simplemarquee');
+var Cookies = require('js-cookie');
 var md5 = require('blueimp-md5');
+var CACHE_LIST_REGEX = /QPlayer-[a-z\d]{32}/;
 if (!window.QPlayer) {
     window.QPlayer = {};
 }
@@ -64,6 +66,22 @@ window.QPlayer.init = function () {
             });
         }
     };
+
+    if (Cookies.get('QPlayer') === undefined) {
+        // clean cache
+        var length = localStorage.length;
+        for (var i = 0; i < length; i++) {
+            var key = localStorage.key(i);
+            if (CACHE_LIST_REGEX.test(key)) {
+                localStorage.removeItem(key);
+            }
+        }
+        localStorage.removeItem(getLocalStorageName('playing'));
+        Cookies.set('QPlayer', '', {
+            path: '/',
+            sameSite: 'strict'
+        });
+    }
 
     function Shuffle(index) {
         var _this = this;

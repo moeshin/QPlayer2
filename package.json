@@ -2,11 +2,11 @@
   "name": "qplayer2",
   "version": "2.0.8",
   "description": "A simple and compact HTML5 bottom hover music player.",
-  "main": "QPlayer.js",
   "scripts": {
-    "js": "browserify QPlayer.js -o dist/QPlayer.js",
-    "cs": "cp QPlayer.css dist",
-    "js-min": "uglifyjs QPlayer.js -m -o dist/QPlayer.min.js",
+    "build": "npm run js && npm run js-min && npm run css && npm run css-min",
+    "js": "browserify QPlayer.js -g envify -g brfs -g unassertify -p common-shakeify -o dist/QPlayer.js",
+    "js-min": "browserify QPlayer.js -p tinyify | uglifyjs -c -m -o dist/QPlayer.min.js",
+    "css": "cp QPlayer.css dist",
     "css-min": "uglifycss QPlayer.css --output dist/QPlayer.min.css"
   },
   "repository": {
@@ -26,8 +26,13 @@
     "js-cookie": "^2.2.1"
   },
   "devDependencies": {
+    "brfs": "^2.0.2",
     "browserify": "^17.0.0",
+    "common-shakeify": "^0.6.2",
+    "envify": "^4.1.0",
+    "tinyify": "^3.0.0",
     "uglify-js": "^3.12.8",
-    "uglifycss": "^0.0.29"
+    "uglifycss": "^0.0.29",
+    "unassertify": "^2.1.1"
   }
 }

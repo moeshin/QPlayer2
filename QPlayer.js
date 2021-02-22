@@ -1041,6 +1041,9 @@ q.init = function () {
                     if (isNaN(index) || index < 0 || index >= length) {
                         index = getNextIndex();
                     }
+                    if (q.shuffle) {
+                        q.shuffle = new Shuffle(index);
+                    }
                     q.load(index);
                 }
                 loadedList = true;

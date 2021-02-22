@@ -3,7 +3,6 @@
   "version": "2.0.8",
   "description": "A simple and compact HTML5 bottom hover music player.",
   "scripts": {
-    "build": "npm run js && npm run js-min && npm run css && npm run css-min",
     "js": "browserify QPlayer.js -g envify -g brfs -g unassertify -p common-shakeify -o dist/QPlayer.js",
     "js-min": "browserify QPlayer.js -p tinyify | uglifyjs -c -m -o dist/QPlayer.min.js",
     "css": "cp QPlayer.css dist",

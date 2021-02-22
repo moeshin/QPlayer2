@@ -520,6 +520,7 @@ window.QPlayer.init = function () {
         }
         q.index = index;
         q.current = current;
+        localStorage.setItem(listLocalStorageName, index.toString());
         var provider = getProvider(current);
         provider.call('cover', function (url, cache) {
             if (isAllError || !url) {
@@ -1012,7 +1013,15 @@ window.QPlayer.init = function () {
                 if (!(q.index > -1 && q.current && length > q.index && value[q.index] === q.current)) {
                     // if not append song
                     init();
-                    q.load(getNextIndex());
+                    var index = -1;
+                    item = localStorage.getItem(listLocalStorageName);
+                    if (item !== null) {
+                        index = parseInt(item);
+                    }
+                    if (isNaN(index) || index < 0 || index >= length) {
+                        index = getNextIndex();
+                    }
+                    q.load(index);
                 }
                 loadedList = true;
                 if (q.isAutoplay && localStorage.getItem(playingKey) === null) {

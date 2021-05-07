@@ -200,6 +200,16 @@ q.init = function () {
         $title.simplemarquee('resume');
         playTime = getTime().toString();
         updatePlaying();
+        if (v.isPauseOtherWhenPlay) {
+            $('audio, video').each(function () {
+                if (this === audio) {
+                    return;
+                }
+                if (!this.paused) {
+                    this.pause();
+                }
+            });
+        }
     }
 
     function onPause() {
@@ -210,6 +220,14 @@ q.init = function () {
         $q.removeClass('QPlayer-playing');
         $title.simplemarquee('pause');
         removePlaying();
+    }
+
+    function onMediaPlay(e) {
+        var media = e.target;
+        var name = media.nodeName.toLowerCase();
+        if (media !== audio && (name === 'video' || name === 'audio')) {
+            audio.pause();
+        }
     }
 
     function getListLi(index) {
@@ -994,6 +1012,27 @@ q.init = function () {
                     q.play();
                 }
             }
+        },
+        isPauseOtherWhenPlay: {
+            get: function () {
+                return v.isPauseOtherWhenPlay;
+            },
+            set: function (value) {
+                v.isPauseOtherWhenPlay = value;
+            },
+            type: 'bool',
+            default: true
+        },
+        isPauseWhenOtherPlay: {
+            get: function () {
+                return v.isPauseWhenOtherPlay;
+            },
+            set: function (value) {
+                v.isPauseWhenOtherPlay = value;
+                (value ? document.addEventListener : document.removeEventListener)('play', onMediaPlay, true);
+            },
+            type: 'bool',
+            default: true
         },
         loadedList: {
             get: function () {

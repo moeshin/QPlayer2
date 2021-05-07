@@ -1,6 +1,6 @@
 {
   "name": "qplayer2",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A simple and compact HTML5 bottom hover music player.",
   "scripts": {
     "js": "browserify QPlayer.js -g brfs -g envify -g unassertify -p common-shakeify -o dist/QPlayer.js",

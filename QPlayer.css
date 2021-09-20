@@ -76,6 +76,7 @@
     padding: 6px 8px;
 }
 #QPlayer-title {
+    line-height: 16px;
     overflow: hidden;
     white-space: nowrap;
 }
@@ -188,12 +189,9 @@
     right: 0;
 }
 #QPlayer-control-more > * {
+    float: left;
     width: 18px;
     height: 18px;
-}
-#QPlayer-btn-mode {
-    position: relative;
-    float: left;
 }
 .QPlayer-show#QPlayer {
     transform: translateX(264px);

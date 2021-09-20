@@ -102,6 +102,7 @@
     background-color: #FFFFFF;
     border-radius: 50%;
     border: 1px solid #AAAAAA;
+    box-sizing: unset;
 }
 #QPlayer-switch {
     position: relative;

@@ -77,9 +77,5 @@
             });
         }
     };
-    window.QPlayer = $.extend(true, window.QPlayer, {
-        provider: {
-            meto: meto
-        }
-    });
+    window.QPlayer.provider.meto = meto;
 })();

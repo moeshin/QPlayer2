@@ -3,6 +3,7 @@
 [![jsDelivr](https://img.shields.io/jsdelivr/gh/hm/moeshin/QPlayer2?style=flat-square)](https://www.jsdelivr.com/package/gh/moeshin/QPlayer2)
 [![jsDelivr](https://img.shields.io/github/v/release/moeshin/QPlayer2?style=flat-square)](https://github.com/moeshin/QPlayer2/releases/latest)
 [![GitHub](https://img.shields.io/github/license/moeshin/QPlayer2?style=flat-square)](https://github.com/moeshin/QPlayer2/blob/master/LICENSE)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmoeshin%2FQPlayer2.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmoeshin%2FQPlayer2?ref=badge_shield)
 
 A simple and compact HTML5 bottom hover music player.
 
@@ -174,3 +175,6 @@ You can also call it after [pjax](https://github.com/defunkt/jquery-pjax).
 
 
 [0]: https://de.wikipedia.org/wiki/LRC_(Dateiformat)
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmoeshin%2FQPlayer2.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmoeshin%2FQPlayer2?ref=badge_large)

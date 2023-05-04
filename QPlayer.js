@@ -51,6 +51,7 @@ if (Cookies.get('QPlayer') === undefined) {
 }
 
 var q = window.QPlayer = $.extend(true, {
+    isListNoHistory: false,
     defaultProvider: 'default',
     provider: {
         default: {
@@ -1073,9 +1074,11 @@ q.init = function () {
                     // if not append song
                     init();
                     var index = -1;
-                    item = localStorage.getItem(listLocalStorageName);
-                    if (item !== null) {
-                        index = parseInt(item);
+                    if (!q.isListNoHistory) {
+                        item = localStorage.getItem(listLocalStorageName);
+                        if (item !== null) {
+                            index = parseInt(item);
+                        }
                     }
                     if (isNaN(index) || index < 0 || index >= length) {
                         index = getNextIndex();

@@ -1,8 +1,20 @@
 import {Lyrics} from "./lyrics.mjs";
 
-type UrlCallback = (url: string, isCache?: boolean) => void;
-export type TextCallback = (text: string) => void;
-type ProviderCallback<T extends Function> = (current: ListItem, success: T, error: () => void) => void;
+export interface ErrorCallback {
+    (): void
+}
+export interface SuccessCallback {
+    (data: any, isCache?: boolean): void
+}
+export interface TextCallback extends SuccessCallback {
+    (text: string, isCache?: boolean): void
+}
+export interface LyricsCallback extends SuccessCallback {
+    (lyrics: string | Lyrics): void
+}
+interface ProviderCallback<T extends SuccessCallback> {
+    (current: ListItem, success: T, error: () => void): void
+}
 
 export type ProvideType = 'audio' | 'cover' | 'lyrics';
 
@@ -17,21 +29,18 @@ export interface ListItem extends Record<string, any> {
 
 export interface IProvider extends Record<string, any> {
     name?: string;
-    audio?: true | ProviderCallback<UrlCallback>;
-    cover?: true | ProviderCallback<UrlCallback>;
-    lyrics?: true | ProviderCallback<TextCallback>;
+    audio?: true | ProviderCallback<TextCallback>;
+    cover?: true | ProviderCallback<TextCallback>;
+    lyrics?: true | ProviderCallback<LyricsCallback>;
     load?(current: ListItem, cache: ProviderCallbackCache): void;
 }
 
-type SuccessCallback = (data: any, isCache?: boolean) => void;
-type ErrorCallback = () => void;
-
 interface ICallback {
-    success: (data: any, cache: any) => void;
+    success: SuccessCallback;
     error: ErrorCallback;
 }
 
-class Provider {
+export class Provider {
     readonly provider: IProvider;
     readonly current: ListItem;
     readonly cache = new ProviderCallbackCache();
@@ -54,7 +63,9 @@ class Provider {
         }
         const callback = this.provider[name];
         if (callback === true) {
-            this.cache.set(name, success, error);
+            if (!this.isStop) {
+                this.cache.set(name, success, error);
+            }
             return;
         }
         if (callback) {

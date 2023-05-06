@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {IProvider, ListItem, TextCallback} from "../provider.mjs";
+import {IProvider, ListItem, LyricsCallback} from "../provider.mjs";
 
 export interface DefaultProviderListItem extends ListItem {
     lrc?: string,
@@ -7,7 +7,7 @@ export interface DefaultProviderListItem extends ListItem {
 
 export class DefaultProvider implements IProvider {
     dataType = '*';
-    lyrics(current: DefaultProviderListItem, success: TextCallback) {
+    lyrics(current: DefaultProviderListItem, success: LyricsCallback) {
         const url = current.lrc;
         if (!url) {
             return;

@@ -197,6 +197,7 @@ q.init = function () {
     }
 
     function onPlay() {
+        audio.isLoad = true;
         $q.addClass('QPlayer-playing');
         $title.simplemarquee('resume');
         playTime = getTime().toString();
@@ -618,7 +619,7 @@ q.init = function () {
             }
         } else {
             index = q.index;
-            if (audio.readyState !== 0) {
+            if (audio.readyState !== 0 && audio.isLoad) {
                 onPlay();
                 audioPlay();
                 return 2;
@@ -1074,7 +1075,9 @@ q.init = function () {
                     // if not append song
                     init();
                     var index = -1;
-                    if (!q.isListNoHistory) {
+                    if (q.isListNoHistory) {
+                        audio.isLoad = false;
+                    } else {
                         item = localStorage.getItem(listLocalStorageName);
                         if (item !== null) {
                             index = parseInt(item);

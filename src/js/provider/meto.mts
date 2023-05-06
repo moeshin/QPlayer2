@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {IProvider, ListItem, ProviderCallbackCache} from "../provider.mjs";
+import {IProvider, ListItem, LoadCallback} from "../provider.mjs";
 import {DefaultProviderListItem} from "./default.mjs";
 
 function renameValue(obj: any, map: Record<string, string>) {
@@ -28,7 +28,7 @@ export class MetoProvider implements IProvider {
     audio: true;
     cover: true;
     lyrics: true;
-    load(current: MetoProviderListItem, cache: ProviderCallbackCache) {
+    load(current: MetoProviderListItem, load: LoadCallback) {
         $.ajax({
             url: this.api,
             data: {
@@ -38,23 +38,23 @@ export class MetoProvider implements IProvider {
             },
             success: (data: MetoSongData[]) => {
                 if (!Array.isArray(data) || data.length === 0) {
-                    cache.error('audio');
+                    load.error('audio');
                     return;
                 }
                 const song = data[0];
                 if (song.pic) {
-                    cache.success('cover', song.pic);
+                    load.success('cover', song.pic);
                 }
                 if (song.lrc) {
                     $.ajax({
                         url: song.lrc,
                         success: data => {
-                            cache.success('lyrics', data);
+                            load.success('lyrics', data);
                         },
                     });
                 }
                 if (song.url) {
-                    cache.success('audio', song.url);
+                    load.success('audio', song.url);
                 }
             },
         });

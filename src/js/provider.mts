@@ -4,10 +4,10 @@ export interface ErrorCallback {
     (): void
 }
 export interface SuccessCallback {
-    (data: any, isCache?: boolean): void
+    (data: any): void
 }
 export interface TextCallback extends SuccessCallback {
-    (text: string, isCache?: boolean): void
+    (text: string): void
 }
 export interface LyricsCallback extends SuccessCallback {
     (lyrics: string | Lyrics): void
@@ -16,7 +16,7 @@ interface ProviderCallback<T extends SuccessCallback> {
     (current: ListItem, success: T, error: () => void): void
 }
 
-export type ProvideType = 'audio' | 'cover' | 'lyrics';
+export type ProvideType = 'audio' | 'cover' | 'lyrics' | string;
 
 export interface ListItem extends Record<string, any> {
     name: string;
@@ -32,7 +32,7 @@ export interface IProvider extends Record<string, any> {
     audio?: true | ProviderCallback<TextCallback>;
     cover?: true | ProviderCallback<TextCallback>;
     lyrics?: true | ProviderCallback<LyricsCallback>;
-    load?(current: ListItem, cache: ProviderCallbackCache): void;
+    load?(current: ListItem, cache: LoadCallback): void;
 }
 
 interface ICallback {
@@ -43,16 +43,16 @@ interface ICallback {
 export class Provider {
     readonly provider: IProvider;
     readonly current: ListItem;
-    readonly cache = new ProviderCallbackCache();
+    readonly cache = new LoadCallback();
 
     private isStop: boolean;
 
-    constructor(provider: IProvider, current: ListItem) {
-        this.provider = provider;
+    constructor(current: ListItem, provider: IProvider) {
         this.current = current;
+        this.provider = provider;
     }
 
-    call(name: ProvideType, success: SuccessCallback, error?: () => void) {
+    callback(name: ProvideType, success: SuccessCallback, error?: () => void) {
         const data = this.current[name];
         if (data) {
             success(data);
@@ -89,22 +89,21 @@ export class Provider {
 }
 
 
-export class ProviderCallbackCache {
-    callbacks: Record<string, ICallback> = {};
-    caches: Record<string, {
-        data: any,
-        cache: any,
-    } | false> = {};
+export class LoadCallback {
+    callbacks: Record<ProvideType, ICallback> = {};
+    caches: Record<ProvideType, {
+        data?: any,
+        err?: boolean,
+    }> = {};
 
-    success(type: ProvideType, data: any, cache?: any) {
+    success(type: ProvideType, data: any) {
         const callback = this.callbacks[type];
         if (callback) {
-            callback.success(data, cache);
+            callback.success(data);
             return;
         }
         this.caches[type] = {
             data,
-            cache,
         };
     }
 
@@ -114,19 +113,23 @@ export class ProviderCallbackCache {
             callback.error;
             return;
         }
-        this.caches[type] = false;
+        this.caches[type] = {
+            err: true,
+        };
     }
 
     set(type: ProvideType, success: SuccessCallback, error: ErrorCallback) {
-        // if (isStop) return;
-        const cache = this.caches[type];
+        const cache = this.caches[type] || {};
         if (cache) {
-            success(cache.data, cache.cache);
-            return;
-        }
-        if (cache === false) {
-            error();
-            return;
+            const {data, err} = cache;
+            if (err) {
+                error();
+                return;
+            }
+            if (data) {
+                this.success(type, data);
+                return;
+            }
         }
         this.callbacks[type] = {
             success,

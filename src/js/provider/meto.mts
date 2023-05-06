@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {IProvider, ProviderCallbackCache, ProviderListItem} from "../provider.mjs";
+import {IProvider, ListItem, ProviderCallbackCache} from "../provider.mjs";
 import {DefaultProviderListItem} from "./default.mjs";
 
 function renameValue(obj: any, map: Record<string, string>) {
@@ -11,7 +11,7 @@ function renameValue(obj: any, map: Record<string, string>) {
 
 export type MetoServer = 'netease' | 'tencent' | 'xiami' | 'kugou' | 'baidu' | 'kuwo';
 
-export interface MetoProviderListItem extends ProviderListItem {
+export interface MetoProviderListItem extends ListItem {
     id: any;
     server?: MetoServer;
 }

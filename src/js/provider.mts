@@ -1,20 +1,29 @@
-type UrlCallback = (url: string, cache: any) => void;
+import {Lyrics} from "./lyrics.mjs";
+
+type UrlCallback = (url: string, isCache?: boolean) => void;
 export type TextCallback = (text: string) => void;
-type ProviderCallback<T extends Function> = (current: any, success: T, error: () => void) => void;
+type ProviderCallback<T extends Function> = (current: ListItem, success: T, error: () => void) => void;
 
 export type ProvideType = 'audio' | 'cover' | 'lyrics';
 
-export interface ProviderListItem {
-    provider?: string,
+export interface ListItem extends Record<string, any> {
+    name: string;
+    artist?: string | string[];
+    audio?: string;
+    cover?: string;
+    lyrics?: string | Lyrics;
+    provider?: string;
 }
 
 export interface IProvider extends Record<string, any> {
+    name?: string;
     audio?: true | ProviderCallback<UrlCallback>;
     cover?: true | ProviderCallback<UrlCallback>;
     lyrics?: true | ProviderCallback<TextCallback>;
+    load?(current: ListItem, cache: ProviderCallbackCache): void;
 }
 
-type SuccessCallback = (data: any, cache: any) => void;
+type SuccessCallback = (data: any, isCache?: boolean) => void;
 type ErrorCallback = () => void;
 
 interface ICallback {
@@ -23,29 +32,47 @@ interface ICallback {
 }
 
 class Provider {
-    readonly iProvider: IProvider;
-    readonly current: Record<string, any>;
+    readonly provider: IProvider;
+    readonly current: ListItem;
     readonly cache = new ProviderCallbackCache();
 
     private isStop: boolean;
 
-    constructor(iProvider: IProvider, current: Record<string, any>) {
-        this.iProvider = iProvider;
+    constructor(provider: IProvider, current: ListItem) {
+        this.provider = provider;
         this.current = current;
     }
 
-    call<T extends Function>(name: ProvideType, success: T, error?: () => void) {
-        if (!error) {
-            error = () => {};
-        }
+    call(name: ProvideType, success: SuccessCallback, error?: () => void) {
         const data = this.current[name];
         if (data) {
             success(data);
             return;
         }
-        const callback = this.iProvider[name];
+        if (!error) {
+            error = () => {};
+        }
+        const callback = this.provider[name];
         if (callback === true) {
-            // this.cache.set(name, success, error);
+            this.cache.set(name, success, error);
+            return;
+        }
+        if (callback) {
+            callback(this.current, success, error);
+            return;
+        }
+        error();
+    }
+
+    stop() {
+        this.isStop = true;
+    }
+
+    load() {
+        this.isStop = false;
+        const {load} = this.provider;
+        if (load) {
+            load(this.current, this.cache);
         }
     }
 }

@@ -1,7 +1,7 @@
 import $ from "jquery";
-import {IProvider, ProviderListItem, TextCallback} from "../provider.mjs";
+import {IProvider, ListItem, TextCallback} from "../provider.mjs";
 
-export interface DefaultProviderListItem extends ProviderListItem {
+export interface DefaultProviderListItem extends ListItem {
     lrc?: string,
 }
 

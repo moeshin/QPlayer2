@@ -1,5 +1,5 @@
 {
-  "name": "qplayer2",
+  "name": "@moeshin/qplayer2",
   "version": "2.1.4",
   "description": "A simple and compact HTML5 bottom hover music player.",
   "scripts": {

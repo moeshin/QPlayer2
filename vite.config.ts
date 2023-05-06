@@ -1,9 +1,10 @@
 import { defineConfig } from 'vite';
 
-defineConfig({
+// noinspection JSUnusedGlobalSymbols
+export default defineConfig({
     plugins: [],
     build: {
-        target: 'es5',
+        target: 'es6',
         outDir: 'dist',
         minify: true,
         cssMinify: true,
@@ -12,9 +13,6 @@ defineConfig({
             name: 'QPlayer',
             fileName: 'QPlayer',
             formats: ['es', 'umd'],
-        },
-        rollupOptions: {
-            external: 'jquery'
         },
     }
 });

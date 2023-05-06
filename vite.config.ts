@@ -8,7 +8,7 @@ defineConfig({
         minify: true,
         cssMinify: true,
         lib: {
-            entry: 'src/js/QPlayer.ts',
+            entry: 'src/QPlayer.ts',
             name: 'QPlayer',
             fileName: 'QPlayer',
             formats: ['es', 'umd'],

@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {IProvider, ProviderCallbackCache, ProviderListItem} from "../provider";
+import {IProvider, ProviderCallbackCache, ProviderListItem} from "../provider.mjs";
 import {DefaultProviderListItem} from "./default.mjs";
 
 function renameValue(obj: any, map: Record<string, string>) {

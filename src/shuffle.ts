@@ -21,14 +21,12 @@ export class Shuffle {
 
     append(index: number) {
         this.set.add(index);
-        this.list.append(index);
-        this.node = this.list.tail;
+        this.node = this.list.append(index);
     }
 
     prepend(index: number) {
         this.set.add(index);
-        this.list.prepend(index);
-        this.node = this.list.head;
+        this.node = this.list.prepend(index);
     }
 
     random() {

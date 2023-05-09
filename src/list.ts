@@ -11,9 +11,12 @@ export class LinkedNode<T> {
 
 export class LinkedIterator<T> implements Iterator<T> {
 
+    readonly list: LinkedList<T>;
     node: LinkedNode<T>;
+    isFirstInit = true;
     
-    constructor(node: LinkedNode<T>) {
+    constructor(list: LinkedList<T>, node: LinkedNode<T> = list.head) {
+        this.list = list;
         this.node = node;
     }
 
@@ -28,19 +31,33 @@ export class LinkedIterator<T> implements Iterator<T> {
     }
 
     next(...args: [] | [undefined]): IteratorResult<T> {
-        const result = this.return();
-        if (!result.done) {
-            this.node = this.node.next;
+        if (this.isFirstInit) {
+            this.isFirstInit = false;
+        } else {
+            this.node = this.node?.next;
         }
-        return result;
+        return this.return();
     }
 
-    // prev(): IteratorResult<T> {
-    //     if (this.node) {
-    //         this.node = this.node.prev;
-    //     }
-    //     return this.return();
-    // }
+    prev(): IteratorResult<T> {
+        if (this.isFirstInit) {
+            this.isFirstInit = false;
+        }
+        this.node = this.node?.prev;
+        return this.return();
+    }
+
+    remove() {
+        LinkedList.remove(this.node, this.list);
+    }
+
+    get isFirst() {
+        return this.node === this.list.head;
+    }
+
+    get isLast() {
+        return this.node === this.list.tail;
+    }
 }
 
 export class LinkedList<T> implements Iterable<T> {
@@ -49,61 +66,92 @@ export class LinkedList<T> implements Iterable<T> {
     length = 0;
 
     [Symbol.iterator](): LinkedIterator<T> {
-        return new LinkedIterator<T>(this.head);
-    }
-
-    append(value: T) {
-        const node = new LinkedNode(value, this.tail);
-        if (this.length > 0) {
-            this.tail.next = node;
-            this.tail = node;
-        } else {
-            this.head = node;
-            this.tail = node;
-        }
-        ++this.length;
+        return new LinkedIterator<T>(this);
     }
 
     prepend(value: T) {
-        const node = new LinkedNode(value, null, this.head);
-        if (this.length > 0) {
-            this.head.prev = node;
-            this.head = node;
+        return this.insert(null, value);
+    }
+
+    append(value: T) {
+        return this.insert(null, value, false);
+    }
+
+    insert(target: LinkedNode<T> | null, value: T, isPrev = true) {
+        const node = new LinkedNode(value);
+        if (!target) {
+            target = isPrev ? this.head : this.tail;
+        }
+        if (target) {
+            if (isPrev) {
+                node.next = target;
+                if ((node.prev = target.prev)) {
+                    node.prev.next = node;
+                }
+                target.prev = node;
+                if (this.head === target) {
+                    this.head = node;
+                }
+            } else {
+                node.prev = target;
+                if ((node.next = target.next)) {
+                    node.next.prev = node;
+                }
+                target.next = node;
+                if (this.tail === target) {
+                    this.tail = node;
+                }
+            }
         } else {
             this.head = node;
             this.tail = node;
         }
+
         ++this.length;
+        return node;
+    }
+
+    get(index: number) {
+        if (index < 0 || index >= this.length) {
+            return undefined;
+        }
+        if (index >= this.length / 2 - 1) {
+            index *= -1;
+        }
+        let value: LinkedNode<T>;
+        if (index > -1) {
+            value = this.head;
+            for (let i = 0; i < index; ++i) {
+                value = value.next;
+            }
+        } else {
+            value = this.tail;
+            index = -1 * index - 1;
+            for (let i = 0; i < index; ++i) {
+                value = value.prev;
+            }
+        }
+        return value;
     }
 
     // at(index: number) {
-    //     let value: LinkedNode<T>;
-    //     if (index > -1) {
-    //         value = this.head;
-    //         for (let i = 0; i < index; ++i) {
-    //             value = value.next;
-    //         }
-    //     } else {
-    //         value = this.tail;
-    //         index = -1 * index - 1;
-    //         for (let i = 0; i < index; ++i) {
-    //             value = value.prev;
-    //         }
+    //     if (index < 0) {
+    //         index += this.length;
     //     }
-    //     return value;
+    //     return this.get(index);
     // }
 
-    // static remove<T>(node: LinkedNode<T>, list?: LinkedList<T>) {
-    //     const {prev, next} = node;
-    //     if (prev != null) {
-    //         prev.next = next;
-    //     } else if (list?.head === node) {
-    //         list.head = next;
-    //     }
-    //     if (next != null) {
-    //         next.prev = prev;
-    //     } else if (list?.tail === node) {
-    //         list.tail = prev;
-    //     }
-    // }
+    static remove<T>(node: LinkedNode<T>, list?: LinkedList<T>) {
+        const {prev, next} = node;
+        if (prev != null) {
+            prev.next = next;
+        } else if (list?.head === node) {
+            list.head = next;
+        }
+        if (next != null) {
+            next.prev = prev;
+        } else if (list?.tail === node) {
+            list.tail = prev;
+        }
+    }
 }

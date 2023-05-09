@@ -1,3 +1,17 @@
+// import {LinkedList} from "./list";
+//
+// const list = new LinkedList<number>();
+// list.append(6);
+// list.append(2);
+// list.prepend(3);
+// list.append(4);
+// const node = list.at(2);
+// console.log(node.value);
+// list.insert(node, 233);
+// list.insert(node, 666, false);
+// list.insert(null, 123, false);
+// console.log([...list]);
+
 // import {Shuffle} from "./shuffle";
 //
 // const shuffle = new Shuffle(10);

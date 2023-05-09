@@ -1,6 +1,8 @@
+import {LinkedList, LinkedNode} from "./list";
+
 export class Lyrics {
-    readonly times: number[] = [];
-    readonly texts: string[] = [];
+    readonly times: number[];
+    readonly texts: string[];
     offset = 0;
 
     constructor(lrc: string) {
@@ -8,6 +10,35 @@ export class Lyrics {
         const timePattern = /\t*\[([0-6]?\d):([0-6]?\d)(?:\.(\d{1,3}))?]/g;
         const textPattern = /.*/mg;
         const offsetPattern = /^\[offset:\t*([+-]?\d+)]/mg;
+        const timeList = new LinkedList<number>();
+        const textList = new LinkedList<string>();
+        const add = (time: number, text: string) => {
+            let i = 0;
+            const end = timeList.length - 1;
+            const iter = timeList[Symbol.iterator]();
+            while (true) {
+                const rst = iter.next();
+                if (rst.done) {
+                    break;
+                }
+                const node = iter.node;
+                const t = node.value;
+                if (t < time) {
+                    continue;
+                }
+                if (t === time) {
+                    textList.get(i).value += '<br>' + text;
+                    return;
+                }
+                if (i < end) {
+                    timeList.insert(iter.node, time);
+                    textList.insert(textList.get(i), text);
+                    return;
+                }
+            }
+            timeList.append(time);
+            textList.append(text);
+        };
         while (linePattern.exec(lrc)) {
             let result: RegExpExecArray;
             const lineIndex = linePattern.lastIndex;
@@ -49,31 +80,11 @@ export class Lyrics {
 
             const text = textPattern.exec(lrc)[0].trim();
             for (let time of times) {
-                this.add(time, text);
+                add(time, text);
             }
         }
-    }
-
-    add(time: number, text: string) {
-        const {length} = this.times;
-        const last = length - 1;
-        for (let i = 0; i < length; ++i) {
-            const t = this.times[i];
-            if (t < time) {
-                continue;
-            }
-            if (t === time) {
-                this.texts[i] += '<br>' + text;
-                return;
-            }
-            if (i < last) {
-                this.times.splice(i, 0, time);
-                this.texts.splice(i, 0, text);
-                return;
-            }
-        }
-        this.times.push(time);
-        this.texts.push(text);
+        this.times = Array.from(timeList);
+        this.texts = Array.from(textList);
     }
 
     find(time: number) {

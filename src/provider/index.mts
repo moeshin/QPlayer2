@@ -1,4 +1,4 @@
-import {Lyrics} from "../lyrics.mjs";
+import {Lyrics} from "../lyrics";
 
 export interface ErrorCallback {
     (): void

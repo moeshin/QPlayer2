@@ -8,12 +8,12 @@ export class Lyrics {
         const timePattern = /\t*\[([0-6]?\d):([0-6]?\d)(?:\.(\d{1,3}))?]/g;
         const textPattern = /.*/mg;
         const offsetPattern = /^\[offset:\t*([+-]?\d+)]/mg;
-        while (linePattern.exec(lrc) != null) {
+        while (linePattern.exec(lrc)) {
             let result: RegExpExecArray;
             const lineIndex = linePattern.lastIndex;
 
             offsetPattern.lastIndex = lineIndex;
-            if ((result = offsetPattern.exec(lrc)) != null) {
+            if ((result = offsetPattern.exec(lrc))) {
                 linePattern.lastIndex = offsetPattern.lastIndex;
                 this.offset = parseFloat(result[1]);
                 continue;
@@ -21,7 +21,7 @@ export class Lyrics {
 
             let timeIndex = timePattern.lastIndex = lineIndex;
             const isTime = () => (result = timePattern.exec(lrc)) != null && result.index === timeIndex;
-            if (isTime()) {
+            if (!isTime()) {
                 ++linePattern.lastIndex;
                 continue;
             }

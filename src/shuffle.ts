@@ -1,41 +1,16 @@
-/**
- * Fisher–Yates shuffle
- *
- * @param array
- * @param start
- * @param end
- */
-export function shuffle<T>(array: T[], start = 0, end = array.length - 1): T[] {
-    for (let i = end; i > start; --i) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-}
-
-
+import {LinkedList, LinkedNode} from "./list";
 
 function random(max: number) {
     // [0, max)
     return Math.floor(Math.random() * max);
 }
 
-class Value {
-    value: number;
-    prev: Value;
-    next: Value;
-
-    constructor(value: number, prev: Value = null, next: Value = null) {
-        this.value = value;
-        this.prev = prev;
-        this.next = next;
-    }
-}
-
 export class Shuffle {
-    max: number;
-    current: Value = null;
+
+    private _max = 0;
     set = new Set<number>();
+    list = new LinkedList<number>();
+    node: LinkedNode<number> = null;
 
     constructor(max: number, index?: number) {
         this.max = max;
@@ -45,45 +20,70 @@ export class Shuffle {
     }
 
     append(index: number) {
-        this.current = new Value(index, this.current);
         this.set.add(index);
+        this.list.append(index);
+        this.node = this.list.tail;
     }
 
     prepend(index: number) {
-        this.current = new Value(index, null, this.current);
         this.set.add(index);
+        this.list.prepend(index);
+        this.node = this.list.head;
     }
 
     random() {
-        if (this.max > 0) {
-            if (!this.set.size) {
-                return random(this.max);
-            }
+        if (this.length < 1) {
+            return random(this._max);
+        }
 
-            const index = random(this.max - this.set.size);
-            for (let i = 0, j = -1; i < this.max; ++i) {
-                if (!this.set.has(i) && ++j >= index) {
-                    return i;
-                }
+        const index = random(this._max - this.length);
+        for (let i = 0, j = -1; i < this._max; ++i) {
+            if (!this.set.has(i) && ++j >= index) {
+                return i;
             }
         }
         return -1;
     }
 
     next() {
+        if (this.node === this.list.tail) {
+            if (this.length < this._max) {
+                this.append(this.random());
+            } else {
+                this.node = this.list.head;
+            }
+        } else {
+            this.node = this.node.next;
+        }
+        return this.node.value;
     }
 
-    // private push() {
-    //     [].
-    // }
-    // next() {
-    //     if (this.index + 1 === this.list.length) {
-    //         if (this.list.length >= this.list.length) {
-    //             this.index = 0;
-    //             return this.list[0];
-    //         }
-    //         return push();
-    //     }
-    //     return this.list[++this.index];
-    // }
+    prev() {
+        if (this.node === this.list.head) {
+            if (this.length < this._max) {
+                this.prepend(this.random());
+            } else {
+                this.node = this.list.tail;
+            }
+        } else {
+            this.node = this.node.prev;
+        }
+        return this.node.value;
+    }
+
+    // noinspection JSUnusedGlobalSymbols
+    get max(): number {
+        return this._max;
+    }
+
+    set max(value: number) {
+        if (value < 1) {
+            throw new RangeError('max < 1');
+        }
+        this._max = value;
+    }
+
+    get length() {
+        return this.list.length;
+    }
 }

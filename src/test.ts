@@ -1,26 +1,11 @@
-// import {Shuffle} from "./shuffle";
-//
-// const shuffle = new Shuffle(10);
-//
-// for (let i = 0; i < 11; i++) {
-//     if (i == 10) {
-//         debugger
-//     }
-//     const index = shuffle.random();
-//     console.log(i, index);
-//     shuffle.append(index);
-// }
-//
-// console.log(shuffle);
+import {Shuffle} from "./shuffle";
 
-import {LinkedList} from "./list";
+const shuffle = new Shuffle(10);
 
-const list = new LinkedList<number>();
-
-for (let i = 0; i < 10; i++) {
-    list.append(i);
+for (let i = 0; i < 20; i++) {
+    console.log(shuffle.next());
+    // console.log(shuffle.next());
+    console.log(shuffle.prev());
 }
 
-for (let number of list) {
-    console.log(number);
-}
+console.log([...shuffle.list]);

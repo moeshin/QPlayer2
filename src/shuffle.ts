@@ -1,3 +1,20 @@
+/**
+ * Fisher–Yates shuffle
+ *
+ * @param array
+ * @param start
+ * @param end
+ */
+export function shuffle<T>(array: T[], start = 0, end = array.length - 1): T[] {
+    for (let i = end; i > start; --i) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+
+
 function random(max: number) {
     // [0, max)
     return Math.floor(Math.random() * max);
@@ -38,59 +55,22 @@ export class Shuffle {
     }
 
     random() {
-        // const index = random(this.max);
-        // if (!this.set.has(index)) {
-        //     return index;
-        // }
-        // let i = 1;
-        // let b = !random(2);
-        // let b1 = false;
-        // let b2 = false;
-        // while (true) {
-        //     for (let j = 0; j < 2; ++j) {
-        //         if (b1 && b2) {
-        //             return -1;
-        //         }
-        //         b = !b;
-        //         if (b) {
-        //             if (b1) {
-        //                 continue;
-        //             }
-        //         } else {
-        //             if (b2) {
-        //                 continue;
-        //             }
-        //         }
-        //         const k = index + i * (b ? 1 : -1);
-        //         if (b) {
-        //             if (k >= this.max) {
-        //                 b1 = true;
-        //                 continue;
-        //             }
-        //         } else {
-        //             if (k < 0) {
-        //                 b2 = true;
-        //                 continue;
-        //             }
-        //         }
-        //         if (!this.set.has(k)) {
-        //             return k;
-        //         }
-        //     }
-        //     ++i;
-        // }
+        if (this.max > 0) {
+            if (!this.set.size) {
+                return random(this.max);
+            }
 
-        if (!this.set.size) {
-            return random(this.max);
-        }
-
-        const index = random(this.max - this.set.size);
-        for (let i = 0, j = -1; i < this.max; ++i) {
-            if (!this.set.has(i) && ++j >= index) {
-                return i;
+            const index = random(this.max - this.set.size);
+            for (let i = 0, j = -1; i < this.max; ++i) {
+                if (!this.set.has(i) && ++j >= index) {
+                    return i;
+                }
             }
         }
         return -1;
+    }
+
+    next() {
     }
 
     // private push() {

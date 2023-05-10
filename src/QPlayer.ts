@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {QPlayer} from "./index.mjs";
+import {QPlayer} from "./index";
 
 $(() => {
     const q = window.QPlayer;

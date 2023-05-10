@@ -1,6 +1,6 @@
 import $ from "jquery";
-import {IProvider, ListItem, LoadCallback} from "./index.mjs";
-import {DefaultProviderListItem} from "./default.mjs";
+import {IProvider, ListItem, LoadCallback} from "./index";
+import {DefaultProviderListItem} from "./default";
 
 function renameValue(obj: any, map: Record<string, string>) {
     for (let key in map) {

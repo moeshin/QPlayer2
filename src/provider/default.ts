@@ -1,5 +1,5 @@
 import $ from "jquery";
-import {IProvider, ListItem, LyricsCallback} from "./index.mjs";
+import {IProvider, ListItem, LyricsCallback} from "./index";
 
 export interface DefaultProviderListItem extends ListItem {
     lrc?: string,

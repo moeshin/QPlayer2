@@ -1,5 +1,5 @@
-import {IProvider} from "./provider/index.mjs";
-import {DefaultProvider} from "./provider/default.mjs";
+import {IProvider} from "./provider";
+import {DefaultProvider} from "./provider/default";
 
 export class QPlayer {
     defaultProvider = 'default';

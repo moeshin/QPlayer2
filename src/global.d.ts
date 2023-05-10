@@ -1,4 +1,4 @@
-import {QPlayer} from "./index.mjs";
+import {QPlayer} from "./index";
 
 declare global {
     interface QPlayerGlobal extends QPlayer {

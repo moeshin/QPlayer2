@@ -13,26 +13,24 @@ export class Lyrics {
         const timeList = new LinkedList<number>();
         const textList = new LinkedList<string>();
         const add = (time: number, text: string) => {
-            let i = 0;
-            const end = timeList.length - 1;
-            const iter = timeList[Symbol.iterator]();
+            const timeIter = timeList.iter();
             while (true) {
-                const rst = iter.next();
-                if (rst.done) {
+                const result = timeIter.next();
+                if (result.done) {
                     break;
                 }
-                const node = iter.node;
+                const {node, index} = timeIter;
                 const t = node.value;
                 if (t < time) {
                     continue;
                 }
                 if (t === time) {
-                    textList.get(i).value += '<br>' + text;
+                    textList.get(index).value += '<br>' + text;
                     return;
                 }
-                if (i < end) {
-                    timeList.insert(iter.node, time);
-                    textList.insert(textList.get(i), text);
+                if (!timeIter.isLast) {
+                    timeList.insert(node, time);
+                    textList.insert(textList.get(index), text);
                     return;
                 }
             }

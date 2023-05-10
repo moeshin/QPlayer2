@@ -1,4 +1,4 @@
-import {LinkedList, LinkedNode} from "./list";
+import {LinkedList} from "./list";
 
 export class Lyrics {
     readonly times: number[];
@@ -13,24 +13,20 @@ export class Lyrics {
         const timeList = new LinkedList<number>();
         const textList = new LinkedList<string>();
         const add = (time: number, text: string) => {
-            const timeIter = timeList.iter();
-            while (true) {
-                const result = timeIter.next();
-                if (result.done) {
-                    break;
-                }
-                const {node, index} = timeIter;
-                const t = node.value;
+            let i = -1;
+            for (let timeNode of timeList.iter()) {
+                ++i;
+                const t = timeNode.value;
                 if (t < time) {
                     continue;
                 }
                 if (t === time) {
-                    textList.get(index).value += '<br>' + text;
+                    textList.get(i).value += '<br>' + text;
                     return;
                 }
-                if (!timeIter.isLast) {
-                    timeList.insert(node, time);
-                    textList.insert(textList.get(index), text);
+                if (timeNode != timeList.tail) {
+                    timeList.insert(timeNode, time);
+                    textList.insert(textList.get(i), text);
                     return;
                 }
             }

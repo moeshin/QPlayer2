@@ -9,65 +9,26 @@ export class LinkedNode<T> {
     }
 }
 
-export interface ILinkedIterator<T, TReturn = any, TNext = undefined> extends Iterator<T, TReturn, TNext> {
-    prev(...args: [] | [TNext]): IteratorResult<T, TReturn>;
-    remove(): void;
-    get isFirst(): boolean;
-    get isLast(): boolean;
-}
+export class LinkedNodeIterator<T>
+    implements Iterator<LinkedNode<T>>, Iterable<LinkedNode<T>> {
 
-export class LinkedNodeIterator<T, TReturn = any, TNext = undefined>
-    implements Iterable<LinkedNode<T>>, ILinkedIterator<LinkedNode<T>, TReturn, TNext> {
+    private node: LinkedNode<T>;
 
-    readonly list: LinkedList<T>;
-    node: LinkedNode<T>;
-    index = -1;
-
-    constructor(list: LinkedList<T>, node: LinkedNode<T> = list.head) {
-        this.list = list;
-        this.node = node;
+    constructor(node: LinkedNode<T>) {
+        this.node = new LinkedNode<T>(null, null, node);
     }
 
-    return(value?: TReturn): IteratorResult<LinkedNode<T>> {
-        return this.node ? {
-            done: false,
-            value: this.node,
-        } : {
+    next(...args: [] | [undefined]): IteratorResult<LinkedNode<T>> {
+        if ((this.node = this.node?.next)) {
+            return {
+                done: false,
+                value: this.node,
+            };
+        }
+        return {
             done: true,
-            value,
+            value: undefined,
         };
-    }
-
-    next(...args: [] | [TNext]): IteratorResult<LinkedNode<T>> {
-        if (this.node && this.index > -1) {
-            this.node = this.node.next;
-        }
-        const r = this.return();
-        if (!r.done) {
-            ++this.index;
-        }
-        return r;
-    }
-
-    prev(...args: [] | [TNext]): IteratorResult<LinkedNode<T>> {
-        this.node = this.node?.prev;
-        const r = this.return();
-        if (!r.done) {
-            --this.index;
-        }
-        return r;
-    }
-
-    remove() {
-        LinkedList.remove(this.node, this.list);
-    }
-
-    get isFirst() {
-        return this.node === this.list.head;
-    }
-
-    get isLast() {
-        return this.node === this.list.tail;
     }
 
     [Symbol.iterator](): Iterator<LinkedNode<T>> {
@@ -75,40 +36,19 @@ export class LinkedNodeIterator<T, TReturn = any, TNext = undefined>
     }
 }
 
-export class LinkedIterator<T, TReturn = any, TNext = undefined>
-    implements ILinkedIterator<T, TReturn, TNext> {
+export class LinkedIterator<T> implements  Iterator<T> {
 
-    readonly iter: LinkedNodeIterator<T, TReturn, TNext>;
+    private readonly iter: LinkedNodeIterator<T>;
 
-    constructor(iter: LinkedNodeIterator<T, TReturn, TNext>) {
+    constructor(iter: LinkedNodeIterator<T>) {
         this.iter = iter;
     }
 
-    return(value?: TReturn): IteratorResult<T, TReturn> {
-        return LinkedIterator.convertResult(this.iter.return(value));
-    }
-
-    next(...args: [] | [TNext]): IteratorResult<T, TReturn> {
+    next(...args: [] | [undefined]): IteratorResult<T> {
         return LinkedIterator.convertResult(this.iter.next(...args));
     }
 
-    prev(...args: [] | [TNext]): IteratorResult<T, TReturn> {
-        return LinkedIterator.convertResult(this.iter.prev(...args));
-    }
-
-    remove(): void {
-        this.iter.remove();
-    }
-
-    get isFirst(): boolean {
-        return this.iter.isFirst;
-    }
-
-    get isLast(): boolean {
-        return this.iter.isLast;
-    }
-
-    static convertResult<T, TReturn = any>(result: IteratorResult<LinkedNode<T>, TReturn>): IteratorResult<T, TReturn> {
+    static convertResult<T>(result: IteratorResult<LinkedNode<T>>): IteratorResult<T> {
         if (result.done) {
             return result;
         }
@@ -129,7 +69,7 @@ export class LinkedList<T> implements Iterable<T> {
     }
 
     iter(): LinkedNodeIterator<T> {
-        return new LinkedNodeIterator<T>(this);
+        return new LinkedNodeIterator<T>(this.head);
     }
 
     prepend(value: T) {
@@ -178,7 +118,7 @@ export class LinkedList<T> implements Iterable<T> {
         if (index < 0 || index >= this.length) {
             return undefined;
         }
-        if (index >= this.length / 2 - 1) {
+        if (index > this.length / 2 - 1) {
             index *= -1;
         }
         let value: LinkedNode<T>;
@@ -189,7 +129,7 @@ export class LinkedList<T> implements Iterable<T> {
             }
         } else {
             value = this.tail;
-            index = -1 * index - 1;
+            index += this.length - 1;
             for (let i = 0; i < index; ++i) {
                 value = value.prev;
             }
@@ -204,17 +144,17 @@ export class LinkedList<T> implements Iterable<T> {
     //     return this.get(index);
     // }
 
-    static remove<T>(node: LinkedNode<T>, list?: LinkedList<T>) {
-        const {prev, next} = node;
-        if (prev != null) {
-            prev.next = next;
-        } else if (list?.head === node) {
-            list.head = next;
-        }
-        if (next != null) {
-            next.prev = prev;
-        } else if (list?.tail === node) {
-            list.tail = prev;
-        }
-    }
+    // static remove<T>(node: LinkedNode<T>, list?: LinkedList<T>) {
+    //     const {prev, next} = node;
+    //     if (prev != null) {
+    //         prev.next = next;
+    //     } else if (list?.head === node) {
+    //         list.head = next;
+    //     }
+    //     if (next != null) {
+    //         next.prev = prev;
+    //     } else if (list?.tail === node) {
+    //         list.tail = prev;
+    //     }
+    // }
 }
